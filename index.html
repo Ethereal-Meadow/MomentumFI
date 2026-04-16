@@ -1,0 +1,1792 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Momentum FI — Jogo de literacia financeira português. Constrói a tua independência financeira em Portugal com impostos reais, imóveis, side hustles e eventos imprevisíveis.">
+<meta name="keywords" content="literacia financeira, independência financeira, jogo financeiro, Portugal, IRS, investimentos, imóveis">
+<meta property="og:title" content="Momentum FI — Liberdade Financeira em Portugal">
+<meta property="og:description" content="Constrói a tua independência financeira em Portugal. Impostos reais, imóveis, side hustles e eventos imprevisíveis.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://momentumfi.pages.dev">
+<meta name="theme-color" content="#00e5a0">
+<title>Momentum FI — Liberdade Financeira em Portugal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --accent: #00e5a0;
+    --accent2: #f59e0b;
+    --accent3: #60a5fa;
+    --danger: #f87171;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --border: #1e293b;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --radius: 12px;
+    --glow: 0 0 30px rgba(0,229,160,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ───── SCREENS ───── */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ───── INTRO ───── */
+  #intro {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 30% 20%, #0d2a1f 0%, #0a0e1a 60%),
+                radial-gradient(ellipse at 80% 80%, #1a1505 0%, transparent 50%);
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  #intro::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 40px,
+      rgba(0,229,160,0.03) 40px, rgba(0,229,160,0.03) 41px
+    ),
+    repeating-linear-gradient(
+      90deg, transparent, transparent 40px,
+      rgba(0,229,160,0.03) 40px, rgba(0,229,160,0.03) 41px
+    );
+  }
+  .intro-content { position: relative; z-index: 1; max-width: 640px; }
+  .logo-tag {
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: block;
+  }
+  h1.game-title {
+    font-family: var(--font-head);
+    font-size: clamp(3rem, 10vw, 5.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  h1.game-title span { color: var(--accent); }
+  .subtitle {
+    font-size: 1.1rem;
+    color: var(--text2);
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    font-style: italic;
+  }
+  .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    padding: 0.85rem 2rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0e1a;
+    box-shadow: 0 0 20px rgba(0,229,160,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,229,160,0.5); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent3);
+    border: 1.5px solid var(--accent3);
+  }
+  .btn-secondary:hover { background: rgba(96,165,250,0.1); transform: translateY(-2px); }
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1.5px solid var(--danger);
+  }
+  .btn-danger:hover { background: rgba(248,113,113,0.1); }
+  .btn-sm { padding: 0.55rem 1.2rem; font-size: 0.78rem; }
+  .btn-full { width: 100%; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ───── CHARACTER SELECT ───── */
+  #char-select {
+    padding: 2rem;
+    background: var(--bg);
+    align-items: center;
+  }
+  .page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  .page-header h2 {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .page-header p { color: var(--text2); margin-top: 0.4rem; }
+
+  .professions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 1.5rem;
+  }
+  .prof-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .prof-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .prof-card.selected { border-color: var(--accent); background: rgba(0,229,160,0.08); box-shadow: var(--glow); }
+  .prof-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .prof-name { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .prof-salary { font-size: 0.8rem; color: var(--accent); margin-top: 0.2rem; font-weight: 500; }
+  .prof-desc { font-size: 0.75rem; color: var(--text2); margin-top: 0.4rem; line-height: 1.4; }
+
+  /* ───── GAME SCREEN ───── */
+  #game { padding: 0; background: var(--bg); }
+
+  .game-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .game-logo {
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+  .header-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .hstat { text-align: center; }
+  .hstat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); }
+  .hstat-value { font-family: var(--font-head); font-weight: 700; font-size: 1rem; }
+  .hstat-value.green { color: var(--accent); }
+  .hstat-value.yellow { color: var(--accent2); }
+  .hstat-value.red { color: var(--danger); }
+  .hstat-value.blue { color: var(--accent3); }
+
+  .game-body {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 0;
+    height: calc(100vh - 103px);
+    overflow: hidden;
+  }
+
+  /* ───── BOARD AREA ───── */
+  .board-area {
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Month indicator */
+  .month-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 0.75rem 1.2rem;
+    border: 1px solid var(--border);
+  }
+  .month-label { font-family: var(--font-head); font-weight: 700; font-size: 1rem; }
+  .fi-progress { display: flex; align-items: center; gap: 0.75rem; flex: 1; margin: 0 1.5rem; }
+  .fi-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .fi-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #00ff88); border-radius: 99px; transition: width 0.5s ease; }
+  .fi-pct { font-family: var(--font-head); font-weight: 700; font-size: 0.85rem; color: var(--accent); min-width: 40px; }
+
+  /* Event log */
+  .event-panel {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    flex: 1;
+  }
+  .panel-title {
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text2);
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  .event-log {
+    padding: 0.75rem 1rem;
+    max-height: 220px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .event-item {
+    font-size: 0.83rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border-left: 3px solid var(--border);
+    color: var(--text2);
+    line-height: 1.4;
+  }
+  .event-item.good { border-color: var(--accent); color: var(--text); background: rgba(0,229,160,0.05); }
+  .event-item.bad { border-color: var(--danger); color: var(--text); background: rgba(248,113,113,0.05); }
+  .event-item.neutral { border-color: var(--accent3); }
+  .event-item.info { border-color: var(--accent2); }
+
+  /* Action cards */
+  .actions-area { display: flex; flex-direction: column; gap: 0.75rem; }
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .action-card-header {
+    padding: 0.6rem 1rem;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-head);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .action-card-body { padding: 1rem; }
+  .opportunity-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .opp-title {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+  }
+  .opp-desc { font-size: 0.83rem; color: var(--text2); line-height: 1.5; }
+  .opp-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin: 0.4rem 0;
+  }
+  .opp-stat {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+  }
+  .opp-stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2); }
+  .opp-stat-val { font-family: var(--font-head); font-weight: 700; font-size: 0.9rem; color: var(--accent); margin-top: 0.1rem; }
+  .opp-buttons { display: flex; gap: 0.5rem; }
+
+  /* Side hustles grid */
+  .hustles-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+  .hustle-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hustle-item:hover:not(.active):not(:disabled) { border-color: var(--accent2); }
+  .hustle-item.active { border-color: var(--accent); background: rgba(0,229,160,0.06); }
+  .hustle-item:disabled { opacity: 0.4; cursor: not-allowed; }
+  .hustle-icon { font-size: 1.1rem; }
+  .hustle-info { flex: 1; min-width: 0; }
+  .hustle-name { font-size: 0.78rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hustle-income { font-size: 0.7rem; color: var(--accent); }
+
+  /* ───── SIDEBAR ───── */
+  .sidebar {
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-section { border-bottom: 1px solid var(--border); padding: 1rem; }
+  .section-label {
+    font-family: var(--font-head);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text2);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Net worth dial */
+  .networth-display {
+    text-align: center;
+    padding: 0.5rem 0;
+  }
+  .networth-amount {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .networth-amount.positive { color: var(--accent); }
+  .networth-amount.negative { color: var(--danger); }
+  .networth-label { font-size: 0.75rem; color: var(--text2); margin-top: 0.2rem; }
+
+  /* Financial rows */
+  .fin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0;
+    font-size: 0.83rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-row-label { color: var(--text2); }
+  .fin-row-value { font-weight: 500; font-family: var(--font-head); }
+  .fin-row-value.pos { color: var(--accent); }
+  .fin-row-value.neg { color: var(--danger); }
+  .fin-row-value.neu { color: var(--text); }
+  .fin-row-value.yel { color: var(--accent2); }
+
+  .fin-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0 0;
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--border);
+    font-weight: 700;
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+  }
+
+  /* Assets list */
+  .asset-list { display: flex; flex-direction: column; gap: 0.4rem; }
+  .asset-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+  .asset-name { color: var(--text); }
+  .asset-income { color: var(--accent); font-weight: 500; }
+  .asset-empty { color: var(--text2); font-size: 0.8rem; font-style: italic; text-align: center; padding: 0.5rem; }
+
+  /* Turn button */
+  .turn-btn-area {
+    padding: 1rem;
+    margin-top: auto;
+  }
+  .turn-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--accent);
+    color: #0a0e1a;
+    border: none;
+    border-radius: var(--radius);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(0,229,160,0.25);
+  }
+  .turn-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(0,229,160,0.4); }
+  .turn-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+  /* ───── MODAL ───── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 480px;
+    width: 100%;
+    transform: scale(0.95);
+    transition: transform 0.2s;
+  }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal h3 {
+    font-family: var(--font-head);
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  .modal-tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    margin-bottom: 0.75rem;
+  }
+  .tag-opportunity { background: rgba(0,229,160,0.15); color: var(--accent); }
+  .tag-event { background: rgba(245,158,11,0.15); color: var(--accent2); }
+  .tag-doodad { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .tag-market { background: rgba(96,165,250,0.15); color: var(--accent3); }
+  .modal p { font-size: 0.9rem; color: var(--text2); line-height: 1.6; margin-bottom: 1rem; }
+  .modal-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .mstat {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+  }
+  .mstat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text2); }
+  .mstat-value { font-family: var(--font-head); font-weight: 700; font-size: 1rem; margin-top: 0.15rem; }
+  .modal-actions { display: flex; gap: 0.75rem; }
+
+  /* Victory */
+  #victory {
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, #0d2a1f 0%, #0a0e1a 70%);
+    text-align: center;
+    padding: 2rem;
+  }
+  .victory-content { max-width: 520px; }
+  .victory-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .victory-title {
+    font-family: var(--font-head);
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+  .victory-subtitle { color: var(--text2); margin-bottom: 2rem; font-size: 1.1rem; }
+  .victory-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .vstat {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+  .vstat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); }
+  .vstat-value { font-family: var(--font-head); font-weight: 800; font-size: 1.3rem; color: var(--accent); margin-top: 0.25rem; }
+
+  /* ───── TABS ───── */
+  .game-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    padding: 0 1.5rem;
+  }
+  .tab-btn {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.2rem;
+    border: none;
+    background: none;
+    color: var(--text2);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; }
+
+  /* ───── DASHBOARD ───── */
+  .dashboard {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    height: calc(100vh - 115px);
+  }
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .dash-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .dash-card-header {
+    padding: 0.65rem 1rem;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-head);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .dash-card-body { padding: 1rem; }
+  .dash-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 0.84rem;
+  }
+  .dash-stat-row:last-child { border-bottom: none; }
+  .dash-stat-label { color: var(--text2); display: flex; align-items: center; gap: 0.4rem; }
+  .dash-stat-value { font-family: var(--font-head); font-weight: 700; font-size: 0.88rem; }
+  .dash-stat-value.pos { color: var(--accent); }
+  .dash-stat-value.neg { color: var(--danger); }
+  .dash-stat-value.neu { color: var(--text); }
+  .dash-stat-value.yel { color: var(--accent2); }
+  .dash-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0 0;
+    margin-top: 0.3rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.92rem;
+  }
+  .wf-bar-wrap { margin-top: 0.5rem; }
+  .wf-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; font-size: 0.78rem; }
+  .wf-label { color: var(--text2); width: 120px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wf-bar-bg { flex: 1; height: 7px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .wf-bar-fill { height: 100%; border-radius: 99px; transition: width 0.5s ease; }
+  .wf-val { font-family: var(--font-head); font-weight: 700; font-size: 0.75rem; width: 55px; text-align: right; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem; }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+  }
+  .summary-card-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text2); }
+  .summary-card-value { font-family: var(--font-head); font-weight: 800; font-size: 1.4rem; margin-top: 0.2rem; }
+  .summary-card-sub { font-size: 0.72rem; color: var(--text2); margin-top: 0.15rem; }
+
+  /* Tax tooltip */
+  .tax-breakdown {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .tax-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    padding: 0.15rem 0;
+    color: var(--text2);
+  }
+  .tax-row.total { color: var(--danger); font-weight: 600; border-top: 1px solid var(--border); margin-top: 0.25rem; padding-top: 0.25rem; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .game-body { grid-template-columns: 1fr; height: auto; }
+    .sidebar { border-left: none; border-top: 1px solid var(--border); }
+    .professions-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(0,229,160,0.15); color: var(--accent); }
+  .badge-red { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .badge-blue { background: rgba(96,165,250,0.15); color: var(--accent3); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ INTRO ═══════════ -->
+<div id="intro" class="screen active">
+  <div class="intro-content">
+    <span class="logo-tag">🇵🇹 Jogo de Literacia Financeira</span>
+    <h1 class="game-title">Momentum<br><span>FI</span></h1>
+    <p class="subtitle">Conquista a tua liberdade financeira em Portugal</p>
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="showScreen('char-select')">▶ Começar</button>
+      <button class="btn btn-secondary" onclick="showHowTo()">Como Jogar</button>
+    </div>
+    <p style="margin-top:2rem; font-size:0.75rem; color:var(--text2)">
+      🎯 Constrói renda passiva &nbsp;·&nbsp; 📊 Impostos reais portugueses &nbsp;·&nbsp; 💼 Side hustles &nbsp;·&nbsp; 🏠 Imóveis
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════ CHAR SELECT ═══════════ -->
+<div id="char-select" class="screen">
+  <div style="padding:2rem; max-width:960px; margin:0 auto; width:100%">
+    <div class="page-header">
+      <h2>Escolhe a tua Profissão</h2>
+      <p>Cada profissão tem salário, despesas e perfil de risco diferentes</p>
+    </div>
+    <div class="professions-grid" id="prof-grid"></div>
+    <div id="prof-detail" style="display:none; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.2rem; margin-bottom:1.5rem; max-width:900px">
+      <div id="prof-detail-content"></div>
+    </div>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="showScreen('intro')">← Voltar</button>
+      <button class="btn btn-primary" id="start-btn" disabled onclick="startGame()">Começar Jornada →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ GAME ═══════════ -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <div class="game-logo">Momentum FI</div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-label">Mês</div>
+        <div class="hstat-value blue" id="h-month">1</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Salário Líquido</div>
+        <div class="hstat-value green" id="h-salary">—</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Renda Passiva</div>
+        <div class="hstat-value yellow" id="h-passive">—</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Despesas</div>
+        <div class="hstat-value red" id="h-expenses">—</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-label">Cash</div>
+        <div class="hstat-value" id="h-cash">—</div>
+      </div>
+    </div>
+    <button class="btn btn-sm btn-danger" onclick="showScreen('intro')">✕ Sair</button>
+  </div>
+
+  <div class="game-tabs">
+    <button class="tab-btn active" onclick="switchTab('jogo')">🎮 Jogo</button>
+    <button class="tab-btn" onclick="switchTab('dashboard')">📊 Dashboard</button>
+  </div>
+
+  <div id="tab-jogo" class="tab-pane active">
+  <div class="game-body">
+    <!-- BOARD -->
+    <div class="board-area">
+      <!-- Month bar -->
+      <div class="month-bar">
+        <div class="month-label" id="month-label">Mês 1</div>
+        <div class="fi-progress">
+          <div class="fi-bar-bg"><div class="fi-bar-fill" id="fi-bar" style="width:0%"></div></div>
+          <div class="fi-pct" id="fi-pct">0%</div>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text2)">Progresso FI</div>
+      </div>
+
+      <!-- Event log -->
+      <div class="event-panel">
+        <div class="panel-title">📋 Diário Financeiro</div>
+        <div class="event-log" id="event-log">
+          <div class="event-item neutral">Bem-vindo ao Momentum FI. Avança o teu primeiro mês!</div>
+        </div>
+      </div>
+
+      <!-- Current opportunity -->
+      <div class="action-card" id="opportunity-area" style="display:none">
+        <div class="action-card-header">🎯 Oportunidade do Mês</div>
+        <div class="action-card-body">
+          <div class="opportunity-card" id="opp-content"></div>
+        </div>
+      </div>
+
+      <!-- Side Hustles -->
+      <div class="action-card">
+        <div class="action-card-header">⚡ Side Hustles <span style="margin-left:auto; font-size:0.7rem; color:var(--text2)" id="hustle-count-label"></span></div>
+        <div class="action-card-body">
+          <div class="hustles-grid" id="hustles-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- Net Worth -->
+      <div class="sidebar-section">
+        <div class="section-label">Patrimônio Líquido</div>
+        <div class="networth-display">
+          <div class="networth-amount" id="networth">€0</div>
+          <div class="networth-label">ativos − passivos</div>
+        </div>
+      </div>
+
+      <!-- Cash Flow -->
+      <div class="sidebar-section">
+        <div class="section-label">Fluxo de Caixa Mensal</div>
+        <div id="cashflow-breakdown"></div>
+      </div>
+
+      <!-- Impostos -->
+      <div class="sidebar-section">
+        <div class="section-label">📊 Impostos (mensal)</div>
+        <div id="tax-breakdown-display"></div>
+      </div>
+
+      <!-- Assets -->
+      <div class="sidebar-section">
+        <div class="section-label">🏦 Ativos com Rendimento</div>
+        <div class="asset-list" id="asset-list">
+          <div class="asset-empty">Ainda sem ativos. Investe!</div>
+        </div>
+      </div>
+
+      <!-- Turn button -->
+      <div class="turn-btn-area">
+        <button class="turn-btn" id="turn-btn" onclick="advanceMonth()">
+          Avançar Mês →
+        </button>
+        <div style="text-align:center; font-size:0.72rem; color:var(--text2); margin-top:0.5rem" id="fi-status-text"></div>
+      </div>
+    </div><!-- end sidebar -->
+  </div><!-- end game-body -->
+  </div><!-- end tab-jogo -->
+
+  <!-- ═══ DASHBOARD TAB ═══ -->
+  <div id="tab-dashboard" class="tab-pane">
+    <div class="dashboard">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-card-label">Fluxo Mensal</div>
+          <div class="summary-card-value" id="d-flow">—</div>
+          <div class="summary-card-sub">receitas − despesas</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Renda Passiva</div>
+          <div class="summary-card-value" id="d-passive" style="color:var(--accent2)">—</div>
+          <div class="summary-card-sub" id="d-fi-pct-label">— % das despesas cobertas</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Patrimônio Líquido</div>
+          <div class="summary-card-value" id="d-networth" style="color:var(--accent)">—</div>
+          <div class="summary-card-sub" id="d-months-label">mês —</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <!-- ENTRADAS -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>💚 De onde vem o dinheiro</span><span id="d-total-in" style="color:var(--accent)">—</span></div>
+          <div class="dash-card-body">
+            <div class="dash-stat-row"><span class="dash-stat-label">💼 Salário bruto</span><span class="dash-stat-value neu" id="d-salary-gross">—</span></div>
+            <div class="dash-stat-row"><span class="dash-stat-label">🏦 IRS + Seg. Social</span><span class="dash-stat-value neg" id="d-taxes">—</span></div>
+            <div class="dash-stat-row" style="padding-bottom:0.6rem; border-bottom:1px solid var(--border); margin-bottom:0.4rem"><span class="dash-stat-label">✅ Salário líquido</span><span class="dash-stat-value pos" id="d-salary-net">—</span></div>
+            <div id="d-passive-rows"></div>
+            <div id="d-hustle-rows"></div>
+            <div class="dash-total-row"><span>Total Entradas</span><span style="color:var(--accent)" id="d-total-in-2">—</span></div>
+          </div>
+        </div>
+
+        <!-- SAÍDAS -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>🔴 Para onde vai o dinheiro</span><span id="d-total-out" style="color:var(--danger)">—</span></div>
+          <div class="dash-card-body" id="d-expenses-body"></div>
+        </div>
+
+        <!-- WATERFALL -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>📊 Peso de cada despesa</span></div>
+          <div class="dash-card-body"><div class="wf-bar-wrap" id="d-waterfall"></div></div>
+        </div>
+
+        <!-- ATIVOS -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>🏦 Ativos e rendimento</span><span id="d-assets-total" style="color:var(--accent2)">—</span></div>
+          <div class="dash-card-body" id="d-assets-body"><div style="color:var(--text2);font-size:0.82rem;font-style:italic">Ainda sem ativos com rendimento.</div></div>
+        </div>
+
+        <!-- IMPOSTOS -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>🇵🇹 Impostos detalhados</span></div>
+          <div class="dash-card-body" id="d-tax-detail"></div>
+        </div>
+
+        <!-- FI PROGRESS -->
+        <div class="dash-card">
+          <div class="dash-card-header"><span>🎯 Progresso FI</span></div>
+          <div class="dash-card-body" id="d-fi-detail"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- end tab-dashboard -->
+
+</div><!-- end #game -->
+<div id="victory" class="screen">
+  <div class="victory-content">
+    <div class="victory-icon">🏆</div>
+    <div class="victory-title">Liberdade<br>Conquistada!</div>
+    <div class="victory-subtitle">Atingiste a Independência Financeira em Portugal</div>
+    <div class="victory-stats">
+      <div class="vstat">
+        <div class="vstat-label">Meses</div>
+        <div class="vstat-value" id="v-months">—</div>
+      </div>
+      <div class="vstat">
+        <div class="vstat-label">Renda Passiva</div>
+        <div class="vstat-value" id="v-passive">—</div>
+      </div>
+      <div class="vstat">
+        <div class="vstat-label">Patrimônio</div>
+        <div class="vstat-value" id="v-networth">—</div>
+      </div>
+    </div>
+    <div class="btn-group" style="justify-content:center">
+      <button class="btn btn-primary" onclick="showScreen('char-select')">Jogar Novamente</button>
+      <button class="btn btn-secondary" onclick="showScreen('intro')">Menu Principal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MODAL ═══════════ -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <div id="modal-tag-el"></div>
+    <h3 id="modal-title"></h3>
+    <p id="modal-desc"></p>
+    <div class="modal-stats" id="modal-stats"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  DATA — Profissões, Oportunidades, Eventos, Hustles
+// ═══════════════════════════════════════════════════
+
+const PROFESSIONS = [
+  {
+    id: "enfermeiro", icon: "🏥", name: "Enfermeiro(a)",
+    salary: 1400, desc: "Salário estável, horários rotativos. Difícil gerir side hustles no início.",
+    expenses: { renda: 500, alimentacao: 250, transportes: 120, saude: 30, outros: 100 },
+    loans: { estudantil: 0 },
+    startCash: 1200, risk: "baixo"
+  },
+  {
+    id: "programador", icon: "💻", name: "Programador(a)",
+    salary: 2200, desc: "Mercado aquecido. Alto potencial de crescimento e freelancing.",
+    expenses: { renda: 700, alimentacao: 300, transportes: 80, saude: 50, outros: 200 },
+    loans: { estudantil: 180 },
+    startCash: 3000, risk: "medio"
+  },
+  {
+    id: "professor", icon: "📚", name: "Professor(a)",
+    salary: 1250, desc: "Estabilidade e férias longas. Ideal para side hustles educativos.",
+    expenses: { renda: 450, alimentacao: 220, transportes: 100, saude: 30, outros: 80 },
+    loans: { estudantil: 0 },
+    startCash: 800, risk: "baixo"
+  },
+  {
+    id: "contabilista", icon: "📊", name: "Técnico(a) de Contas",
+    salary: 1600, desc: "Conhecimento fiscal é vantagem enorme. Sabe aproveitar deduções.",
+    expenses: { renda: 550, alimentacao: 260, transportes: 110, saude: 40, outros: 120 },
+    loans: { estudantil: 0 },
+    startCash: 2500, risk: "baixo",
+    bonus: "tax_reduction" // 10% menos impostos
+  },
+  {
+    id: "arquiteto", icon: "🏛️", name: "Arquiteto(a)",
+    salary: 1800, desc: "Boa rede de contactos. Acesso a melhores deals imobiliários.",
+    expenses: { renda: 650, alimentacao: 280, transportes: 130, saude: 50, outros: 150 },
+    loans: { estudantil: 220 },
+    startCash: 2000, risk: "medio",
+    bonus: "property_discount"
+  },
+  {
+    id: "freelancer", icon: "🎨", name: "Freelancer Criativo",
+    salary: 1100, desc: "Rendimento variável, mas total liberdade. Mestre de side hustles.",
+    expenses: { renda: 500, alimentacao: 240, transportes: 70, saude: 60, outros: 90 },
+    loans: { estudantil: 0 },
+    startCash: 600, risk: "alto",
+    bonus: "hustle_boost" // Side hustles dão 20% mais
+  }
+];
+
+const OPPORTUNITIES = [
+  {
+    id: "imovel_porto", type: "imovel", tag: "🏠 Imóvel",
+    title: "T2 no Porto — Arrendamento",
+    desc: "Apartamento T2 no Porto por €120.000. Com arrendamento de €750/mês, após IMI e condomínio rendes €580 líquidos.",
+    cost: 120000, downpayment: 24000, income: 580, mortgageCost: 420,
+    category: "property"
+  },
+  {
+    id: "imovel_coimbra", type: "imovel", tag: "🏠 Imóvel",
+    title: "Estúdio em Coimbra — Estudantes",
+    desc: "Estúdio perto da UC por €65.000. Arrendamento a estudantes €450/mês, rendimento líquido €320.",
+    cost: 65000, downpayment: 13000, income: 320, mortgageCost: 230,
+    category: "property"
+  },
+  {
+    id: "etf_sp500", type: "acao", tag: "📈 ETF",
+    title: "ETF S&P 500 — Investimento Global",
+    desc: "Investimento em ETF indexado ao S&P 500 via corretora. Crescimento histórico de 10%/ano. Dividendos semestrais.",
+    cost: 5000, income: 42, // ~10%/ano / 12
+    category: "stocks"
+  },
+  {
+    id: "etf_europa", type: "acao", tag: "📈 ETF",
+    title: "ETF Europa — Diversificação",
+    desc: "ETF diversificado em ações europeias. Retorno médio de 7%/ano com dividendos trimestrais.",
+    cost: 3000, income: 18,
+    category: "stocks"
+  },
+  {
+    id: "ppr", type: "poupanca", tag: "💰 PPR",
+    title: "PPR — Poupança Reforma",
+    desc: "Plano Poupança Reforma com benefício fiscal (20% dedução IRS até €400/ano). Rendimento médio 5%/ano.",
+    cost: 2000, income: 8, taxBenefit: 400,
+    category: "savings"
+  },
+  {
+    id: "negocio_lavandaria", type: "negocio", tag: "🏪 Negócio",
+    title: "Participação — Lavandaria Self-Service",
+    desc: "25% de uma lavandaria self-service em Lisboa. Investimento €8.000, rendimento mensal estimado €300.",
+    cost: 8000, income: 300,
+    category: "business"
+  },
+  {
+    id: "certificados_tesouro", type: "poupanca", tag: "🏦 Tesouro",
+    title: "Certificados do Tesouro",
+    desc: "Certificados do Tesouro Poupança Mais. Juro anual atual 3.5%. Capital garantido pelo Estado.",
+    cost: 5000, income: 14, // 3.5%/ano / 12
+    category: "savings"
+  },
+  {
+    id: "imovel_algarve", type: "imovel", tag: "🏖️ Alojamento Local",
+    title: "Alojamento Local no Algarve",
+    desc: "Investimento em AL no Algarve. €160.000, alta temporada rende €2.200/mês, média anual €950/mês.",
+    cost: 160000, downpayment: 32000, income: 950, mortgageCost: 580,
+    category: "property"
+  },
+];
+
+const EVENTS = [
+  { type: "bad", title: "Carro avariado!", desc: "O teu carro avariou. Reparação urgente.", cost: 800 },
+  { type: "bad", title: "Despesa médica", desc: "Consulta especialista + exames. O SNS tem lista de espera.", cost: 400 },
+  { type: "good", title: "Bónus de desempenho!", desc: "A tua empresa reconheceu o teu trabalho.", bonus: 1500 },
+  { type: "bad", title: "Rendas sobem!", desc: "O senhorio aumentou 5% a renda com base no IPC.", rentIncrease: 0.05 },
+  { type: "neutral", title: "Revisão fiscal", desc: "A AT fez uma revisão. Tens de pagar IRS adicional.", cost: 600 },
+  { type: "good", title: "Herança familiar", desc: "Um familiar deixou-te uma pequena herança.", bonus: 3000 },
+  { type: "bad", title: "Despedimento temporário!", desc: "A empresa fez layoff. Ficaste 2 meses sem salário (subsídio parcial).", salaryLoss: 2 },
+  { type: "good", title: "Promoção!", desc: "Foste promovido(a)! Aumento de salário.", salaryBonus: 0.10 },
+  { type: "bad", title: "Fuga de água em casa", desc: "Danos em casa — seguro não cobre tudo.", cost: 1200 },
+  { type: "neutral", title: "Crise imobiliária local", desc: "Preços de arrendamento caem 10% temporariamente.", rentDrop: 0.10 },
+  { type: "good", title: "Mercado em alta!", desc: "Os teus ETFs subiram 15% este mês.", stockBoost: 0.15 },
+  { type: "bad", title: "Crash de mercado", desc: "Correção de -20% nos mercados. Mantém a calma.", stockDrop: 0.20 },
+  { type: "neutral", title: "Inflação alta", desc: "Inflação de 4% aumenta as tuas despesas base.", expenseIncrease: 0.04 },
+  { type: "good", title: "Cliente grande!", desc: "Um grande cliente contratou os teus serviços.", bonus: 2500 },
+];
+
+const SIDE_HUSTLES = [
+  { id: "youtube", icon: "📹", name: "YouTuber", desc: "Canal de conteúdo. Cresce lentamente mas gera renda passiva.", setupCost: 500, monthlyIncome: [0,0,50,100,200,350,500], months: 6 },
+  { id: "uber", icon: "🚗", name: "Uber / Bolt", desc: "Condução em plataformas de mobilidade. Rendimento imediato, flexível. Requer carro próprio.", setupCost: 0, monthlyIncome: [0,300,350,400,400,450,500], months: 0 },
+  { id: "print3d", icon: "🖨️", name: "Impressão 3D", desc: "Venda de peças e serviços de impressão 3D no OLX e Etsy.", setupCost: 800, monthlyIncome: [0,150,200,250,300,350,400], months: 1 },
+  { id: "dropshipping", icon: "📦", name: "Dropshipping", desc: "Loja online sem stock. Risco médio, potencial alto.", setupCost: 300, monthlyIncome: [0,0,100,150,200,300,500], months: 2 },
+  { id: "fotografia", icon: "📷", name: "Fotografia", desc: "Casamentos, eventos, stock photos. Fins de semana.", setupCost: 1200, monthlyIncome: [0,200,300,400,400,500,600], months: 1 },
+  { id: "cursos", icon: "🎓", name: "Cursos Online", desc: "Cria e vende cursos na Udemy ou Hotmart.", setupCost: 200, monthlyIncome: [0,0,0,100,200,300,450], months: 3 },
+  { id: "airbnb", icon: "🛏️", name: "Airbnb Quarto", desc: "Arrenda um quarto da tua casa.", setupCost: 400, monthlyIncome: [200,300,350,400,400,450,500], months: 0 },
+  { id: "reparacoes", icon: "🔧", name: "Reparações Tech", desc: "Reparação de telemóveis e computadores.", setupCost: 300, monthlyIncome: [0,200,300,350,400,450,500], months: 1 },
+  { id: "consultoria", icon: "💡", name: "Consultoria", desc: "Serviços de consultoria na tua área profissional.", setupCost: 0, monthlyIncome: [0,0,300,500,600,700,800], months: 2 },
+];
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let G = {}; // game state
+
+function initGame(prof) {
+  const totalExpenses = Object.values(prof.expenses).reduce((a,b)=>a+b,0);
+  const totalLoans = Object.values(prof.loans).reduce((a,b)=>a+b,0);
+  G = {
+    month: 0,
+    prof: prof,
+    salary: prof.salary,
+    expenses: { ...prof.expenses },
+    loans: { ...prof.loans },
+    cash: prof.startCash,
+    assets: [], // { name, income, value, type }
+    hustles: [], // { id, monthsActive }
+    pendingOpportunity: null,
+    totalMonths: 0,
+    salaryMultiplier: 1,
+    expenseMultiplier: 1,
+    stockMultiplier: 1,
+    events: [],
+    gameOver: false
+  };
+}
+
+// ═══════════════════════════════════════════════════
+//  TAX ENGINE — Portugal 2024
+// ═══════════════════════════════════════════════════
+function calcTaxes(annualGross) {
+  // IRS brackets 2024 (simplificado)
+  const brackets = [
+    { limit: 7703, rate: 0.1325 },
+    { limit: 11623, rate: 0.18 },
+    { limit: 16472, rate: 0.23 },
+    { limit: 21321, rate: 0.26 },
+    { limit: 27146, rate: 0.3275 },
+    { limit: 39791, rate: 0.37 },
+    { limit: 51997, rate: 0.435 },
+    { limit: 81199, rate: 0.45 },
+    { limit: Infinity, rate: 0.48 }
+  ];
+  let tax = 0, prev = 0;
+  for (const b of brackets) {
+    if (annualGross <= prev) break;
+    tax += Math.min(annualGross - prev, b.limit - prev) * b.rate;
+    prev = b.limit;
+  }
+  const ss = annualGross * 0.11; // Segurança Social
+  const surcharge = annualGross > 80000 ? (annualGross - 80000) * 0.025 : 0;
+  let totalAnnual = tax + ss + surcharge;
+
+  // Bonus: contabilista paga menos
+  if (G.prof && G.prof.bonus === "tax_reduction") totalAnnual *= 0.90;
+
+  return {
+    irs: Math.round(tax / 12),
+    ss: Math.round(ss / 12),
+    surcharge: Math.round(surcharge / 12),
+    total: Math.round(totalAnnual / 12)
+  };
+}
+
+function getNetSalary() {
+  const gross = G.salary * G.salaryMultiplier;
+  const taxes = calcTaxes(gross * 14); // 14 meses anuais
+  return Math.round(gross - taxes.total);
+}
+
+function getTotalExpenses() {
+  const base = Object.values(G.expenses).reduce((a,b)=>a+b,0) * G.expenseMultiplier;
+  const loans = Object.values(G.loans).reduce((a,b)=>a+b,0);
+  // Mortgage costs from property assets
+  const mortgages = G.assets.filter(a=>a.mortgage).reduce((s,a)=>s+a.mortgage,0);
+  return Math.round(base + loans + mortgages);
+}
+
+function getPassiveIncome() {
+  let total = 0;
+  // From investment assets
+  G.assets.forEach(a => total += a.income * G.stockMultiplier);
+  // From side hustles
+  G.hustles.forEach(h => {
+    const hustle = SIDE_HUSTLES.find(s=>s.id===h.id);
+    if (!hustle) return;
+    const monthIdx = Math.min(h.monthsActive, hustle.monthlyIncome.length-1);
+    let inc = hustle.monthlyIncome[monthIdx];
+    if (G.prof.bonus === "hustle_boost") inc = Math.round(inc * 1.2);
+    total += inc;
+  });
+  return Math.round(total);
+}
+
+function getMonthlyFlow() {
+  return getNetSalary() + getPassiveIncome() - getTotalExpenses();
+}
+
+function getFIProgress() {
+  const passive = getPassiveIncome();
+  const expenses = getTotalExpenses();
+  if (expenses === 0) return 100;
+  return Math.min(100, Math.round((passive / expenses) * 100));
+}
+
+function getNetWorth() {
+  let assets = G.cash;
+  G.assets.forEach(a => assets += (a.value || 0));
+  const liabilities = Object.values(G.loans).reduce((a,b)=>a+b,0) * 120;
+  G.assets.filter(a=>a.debtRemaining).forEach(a => liabilities + (a.debtRemaining||0)); // rough
+  return Math.round(assets);
+}
+
+// ═══════════════════════════════════════════════════
+//  GAME LOOP
+// ═══════════════════════════════════════════════════
+function advanceMonth() {
+  G.month++;
+  G.totalMonths++;
+  const events = [];
+
+  // Income this month
+  const netSalary = getNetSalary();
+  const passive = getPassiveIncome();
+  const expenses = getTotalExpenses();
+  const flow = netSalary + passive - expenses;
+
+  G.cash += flow;
+
+  events.push({ type: flow >= 0 ? "good" : "bad",
+    text: `Mês ${G.month}: Salário líquido €${fmt(netSalary)} + Passivo €${fmt(passive)} − Despesas €${fmt(expenses)} = ${flow>=0?'+':''}€${fmt(flow)}` });
+
+  // Advance hustles
+  G.hustles.forEach(h => h.monthsActive++);
+
+  // Random event (30% chance)
+  if (Math.random() < 0.30) {
+    const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+    applyEvent(ev, events);
+  }
+
+  // Opportunity (40% chance, not every month)
+  if (Math.random() < 0.40 && !G.pendingOpportunity) {
+    const opp = OPPORTUNITIES[Math.floor(Math.random() * OPPORTUNITIES.length)];
+    G.pendingOpportunity = opp;
+    showOpportunity(opp);
+    events.push({ type: "neutral", text: `🎯 Nova oportunidade: ${opp.title}` });
+  }
+
+  // Log events
+  events.forEach(e => logEvent(e.text, e.type));
+
+  // Check victory
+  if (getFIProgress() >= 100) {
+    setTimeout(()=>showVictory(), 500);
+    return;
+  }
+
+  // Check bankruptcy
+  if (G.cash < -5000) {
+    logEvent("⚠️ Dívida crítica! Reduz as tuas despesas urgentemente.", "bad");
+  }
+
+  updateUI();
+}
+
+function applyEvent(ev, events) {
+  if (ev.cost) {
+    G.cash -= ev.cost;
+    events.push({ type: "bad", text: `⚠️ ${ev.title}: −€${fmt(ev.cost)}` });
+  }
+  if (ev.bonus) {
+    G.cash += ev.bonus;
+    events.push({ type: "good", text: `✨ ${ev.title}: +€${fmt(ev.bonus)}` });
+  }
+  if (ev.rentIncrease) {
+    G.expenses.renda = Math.round(G.expenses.renda * (1 + ev.rentIncrease));
+    events.push({ type: "bad", text: `🏠 ${ev.title}: Renda agora €${fmt(G.expenses.renda)}/mês` });
+  }
+  if (ev.salaryBonus) {
+    G.salary = Math.round(G.salary * (1 + ev.salaryBonus));
+    events.push({ type: "good", text: `🎉 ${ev.title}: Salário agora €${fmt(G.salary)}/mês` });
+  }
+  if (ev.stockBoost) {
+    G.assets.filter(a=>a.type==="stocks").forEach(a=>{ a.value=Math.round(a.value*(1+ev.stockBoost)); a.income=Math.round(a.income*(1+ev.stockBoost)); });
+    events.push({ type: "good", text: `📈 ${ev.title}: ETFs +${Math.round(ev.stockBoost*100)}%` });
+  }
+  if (ev.stockDrop) {
+    G.assets.filter(a=>a.type==="stocks").forEach(a=>{ a.value=Math.round(a.value*(1-ev.stockDrop)); a.income=Math.round(a.income*(1-ev.stockDrop)); });
+    events.push({ type: "bad", text: `📉 ${ev.title}: ETFs −${Math.round(ev.stockDrop*100)}%` });
+  }
+  if (ev.expenseIncrease) {
+    G.expenseMultiplier *= (1 + ev.expenseIncrease);
+    events.push({ type: "bad", text: `💸 ${ev.title}: Despesas aumentaram ${Math.round(ev.expenseIncrease*100)}%` });
+  }
+  if (ev.rentDrop) {
+    G.assets.filter(a=>a.type==="property").forEach(a=>{ a.income=Math.round(a.income*(1-ev.rentDrop)); });
+    events.push({ type: "neutral", text: `🏘️ ${ev.title}: Rendas de imóveis caíram ${Math.round(ev.rentDrop*100)}%` });
+  }
+}
+
+function buyOpportunity(opp) {
+  const cost = opp.downpayment || opp.cost;
+  if (G.cash < cost) {
+    logEvent(`❌ Sem dinheiro suficiente para ${opp.title}. Precisas de €${fmt(cost)}.`, "bad");
+    closeModal();
+    G.pendingOpportunity = null;
+    document.getElementById("opportunity-area").style.display = "none";
+    updateUI();
+    return;
+  }
+  G.cash -= cost;
+  let assetIncome = opp.income;
+  let discount = G.prof.bonus === "property_discount" && opp.category === "property" ? 0.95 : 1;
+
+  G.assets.push({
+    name: opp.title,
+    income: Math.round(assetIncome),
+    value: Math.round((opp.cost || cost) * discount),
+    type: opp.category,
+    mortgage: opp.mortgageCost || 0,
+    debtRemaining: opp.cost ? (opp.cost - cost) : 0
+  });
+
+  logEvent(`✅ Investiste em ${opp.title}. Renda mensal: +€${fmt(opp.income)}`, "good");
+  closeModal();
+  G.pendingOpportunity = null;
+  document.getElementById("opportunity-area").style.display = "none";
+  updateUI();
+}
+
+function skipOpportunity() {
+  logEvent(`⏭️ Passaste a oportunidade: ${G.pendingOpportunity?.title}`, "neutral");
+  closeModal();
+  G.pendingOpportunity = null;
+  document.getElementById("opportunity-area").style.display = "none";
+}
+
+function toggleHustle(hustleId) {
+  const hustle = SIDE_HUSTLES.find(h=>h.id===hustleId);
+  const existing = G.hustles.findIndex(h=>h.id===hustleId);
+  if (existing >= 0) {
+    G.hustles.splice(existing, 1);
+    logEvent(`⏹️ Paraste o side hustle: ${hustle.name}`, "neutral");
+  } else {
+    if (G.cash < hustle.setupCost) {
+      logEvent(`❌ Sem capital para iniciar ${hustle.name}. Precisas de €${fmt(hustle.setupCost)}.`, "bad");
+      return;
+    }
+    if (G.hustles.length >= 3) {
+      logEvent("⚠️ Máximo 3 side hustles em simultâneo. Temos de nos focar!", "neutral");
+      return;
+    }
+    G.cash -= hustle.setupCost;
+    G.hustles.push({ id: hustleId, monthsActive: hustle.months });
+    logEvent(`🚀 Iniciaste: ${hustle.name}. Investimento: €${fmt(hustle.setupCost)}`, "good");
+  }
+  updateUI();
+}
+
+// ═══════════════════════════════════════════════════
+//  UI
+// ═══════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  if (id === "char-select") renderProfessions();
+}
+
+let selectedProf = null;
+function renderProfessions() {
+  const grid = document.getElementById("prof-grid");
+  grid.innerHTML = PROFESSIONS.map(p => `
+    <div class="prof-card ${selectedProf?.id===p.id?'selected':''}" onclick="selectProf('${p.id}')">
+      <div class="prof-icon">${p.icon}</div>
+      <div class="prof-name">${p.name}</div>
+      <div class="prof-salary">€${fmt(p.salary)}/mês bruto</div>
+      <div class="prof-desc">${p.desc}</div>
+    </div>
+  `).join("");
+}
+
+function selectProf(id) {
+  selectedProf = PROFESSIONS.find(p=>p.id===id);
+  renderProfessions();
+  showProfDetail(selectedProf);
+  document.getElementById("start-btn").disabled = false;
+}
+
+function showProfDetail(prof) {
+  const taxes = calcTaxes(prof.salary * 14);
+  const netSalary = prof.salary - taxes.total;
+  const totalExp = Object.values(prof.expenses).reduce((a,b)=>a+b,0) + Object.values(prof.loans).reduce((a,b)=>a+b,0);
+  const flow = netSalary - totalExp;
+  const el = document.getElementById("prof-detail");
+  el.style.display = "block";
+  document.getElementById("prof-detail-content").innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; flex-wrap:wrap">
+      <div>
+        <div class="section-label">Rendimentos</div>
+        <div class="fin-row"><span class="fin-row-label">Salário Bruto</span><span class="fin-row-value neu">€${fmt(prof.salary)}</span></div>
+        <div class="fin-row"><span class="fin-row-label">IRS (est.)</span><span class="fin-row-value neg">−€${fmt(taxes.irs)}</span></div>
+        <div class="fin-row"><span class="fin-row-label">Seg. Social (11%)</span><span class="fin-row-value neg">−€${fmt(taxes.ss)}</span></div>
+        <div class="fin-total"><span>Líquido</span><span style="color:var(--accent)">€${fmt(netSalary)}</span></div>
+      </div>
+      <div>
+        <div class="section-label">Despesas</div>
+        ${Object.entries(prof.expenses).map(([k,v])=>`<div class="fin-row"><span class="fin-row-label">${k}</span><span class="fin-row-value neg">−€${v}</span></div>`).join("")}
+        ${Object.entries(prof.loans).filter(([,v])=>v>0).map(([k,v])=>`<div class="fin-row"><span class="fin-row-label">${k}</span><span class="fin-row-value neg">−€${v}</span></div>`).join("")}
+        <div class="fin-total"><span>Total</span><span style="color:var(--danger)">€${fmt(totalExp)}</span></div>
+      </div>
+      <div>
+        <div class="section-label">Resumo</div>
+        <div class="fin-row"><span class="fin-row-label">Poupança/mês</span><span class="fin-row-value ${flow>=0?'pos':'neg'}">${flow>=0?'+':''}€${fmt(flow)}</span></div>
+        <div class="fin-row"><span class="fin-row-label">Capital inicial</span><span class="fin-row-value yel">€${fmt(prof.startCash)}</span></div>
+        <div class="fin-row"><span class="fin-row-label">Perfil de risco</span><span class="fin-row-value neu">${prof.risk}</span></div>
+        ${prof.bonus ? `<div class="fin-row"><span class="fin-row-label">Bónus</span><span class="badge badge-green">${getBonusLabel(prof.bonus)}</span></div>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function getBonusLabel(bonus) {
+  const map = { tax_reduction: "−10% Impostos", property_discount: "−5% Imóveis", hustle_boost: "+20% Hustles" };
+  return map[bonus] || bonus;
+}
+
+function startGame() {
+  if (!selectedProf) return;
+  initGame(selectedProf);
+  renderHustles();
+  updateUI();
+  showScreen("game");
+  logEvent(`🇵🇹 Bem-vindo(a) à jornada FI como ${selectedProf.name}! Capital inicial: €${fmt(selectedProf.startCash)}`, "good");
+}
+
+function updateUI() {
+  const netSalary = getNetSalary();
+  const passive = getPassiveIncome();
+  const expenses = getTotalExpenses();
+  const flow = netSalary + passive - expenses;
+  const fi = getFIProgress();
+  const nw = getNetWorth();
+  const taxes = calcTaxes(G.salary * G.salaryMultiplier * 14);
+
+  // Header
+  document.getElementById("h-month").textContent = G.month;
+  document.getElementById("h-salary").textContent = `€${fmt(netSalary)}`;
+  document.getElementById("h-passive").textContent = `€${fmt(passive)}`;
+  document.getElementById("h-expenses").textContent = `€${fmt(expenses)}`;
+  const cashEl = document.getElementById("h-cash");
+  cashEl.textContent = `€${fmt(G.cash)}`;
+  cashEl.className = "hstat-value " + (G.cash >= 0 ? "green" : "red");
+
+  // Month bar
+  document.getElementById("month-label").textContent = `Mês ${G.month} · ${G.prof.name}`;
+  document.getElementById("fi-bar").style.width = fi + "%";
+  document.getElementById("fi-pct").textContent = fi + "%";
+
+  // Net worth
+  const nwEl = document.getElementById("networth");
+  nwEl.textContent = `€${fmt(nw)}`;
+  nwEl.className = "networth-amount " + (nw >= 0 ? "positive" : "negative");
+
+  // Cash flow
+  document.getElementById("cashflow-breakdown").innerHTML = `
+    <div class="fin-row"><span class="fin-row-label">Salário líquido</span><span class="fin-row-value pos">+€${fmt(netSalary)}</span></div>
+    <div class="fin-row"><span class="fin-row-label">Renda passiva</span><span class="fin-row-value ${passive>0?'yel':'neu'}">+€${fmt(passive)}</span></div>
+    <div class="fin-row"><span class="fin-row-label">Despesas totais</span><span class="fin-row-value neg">−€${fmt(expenses)}</span></div>
+    <div class="fin-total"><span>${flow>=0?'Sobra':'Falta'}</span><span style="color:${flow>=0?'var(--accent)':'var(--danger)'}">${flow>=0?'+':''}€${fmt(flow)}</span></div>
+  `;
+
+  // Tax breakdown
+  document.getElementById("tax-breakdown-display").innerHTML = `
+    <div class="tax-breakdown">
+      <div class="tax-row"><span>IRS</span><span>€${fmt(taxes.irs)}</span></div>
+      <div class="tax-row"><span>Segurança Social (11%)</span><span>€${fmt(taxes.ss)}</span></div>
+      ${taxes.surcharge > 0 ? `<div class="tax-row"><span>Sobretaxa</span><span>€${fmt(taxes.surcharge)}</span></div>` : ""}
+      <div class="tax-row total"><span>Total impostos/mês</span><span>€${fmt(taxes.total)}</span></div>
+      <div class="tax-row" style="color:var(--text2); font-size:0.72rem"><span>Taxa efectiva anual</span><span>${Math.round((taxes.total*12)/(G.salary*G.salaryMultiplier*14)*100)}%</span></div>
+    </div>
+  `;
+
+  // Assets
+  const assetList = document.getElementById("asset-list");
+  if (G.assets.length === 0) {
+    assetList.innerHTML = '<div class="asset-empty">Ainda sem ativos. Investe!</div>';
+  } else {
+    assetList.innerHTML = G.assets.map(a => `
+      <div class="asset-item">
+        <div>
+          <div class="asset-name">${a.name.length > 24 ? a.name.substring(0,22)+'…' : a.name}</div>
+          <div style="font-size:0.68rem; color:var(--text2)">${typeLabel(a.type)} · €${fmt(a.value)}</div>
+        </div>
+        <div class="asset-income">+€${fmt(a.income)}/mês</div>
+      </div>
+    `).join("");
+  }
+
+  // FI status
+  const fiText = document.getElementById("fi-status-text");
+  if (fi >= 100) {
+    fiText.textContent = "🏆 Liberdade Financeira Conquistada!";
+    fiText.style.color = "var(--accent)";
+  } else if (fi >= 75) {
+    fiText.textContent = `Quase lá! Faltam €${fmt(expenses - passive)}/mês em renda passiva`;
+  } else if (fi >= 50) {
+    fiText.textContent = `A meio caminho! Renda passiva: €${fmt(passive)}/mês`;
+  } else if (fi > 0) {
+    fiText.textContent = `Em construção. Mais €${fmt(expenses - passive)}/mês para atingir FI`;
+  } else {
+    fiText.textContent = `Começa a investir para gerar renda passiva!`;
+  }
+
+  // Hustles
+  renderHustles();
+}
+
+function renderHustles() {
+  const grid = document.getElementById("hustles-grid");
+  if (!G.hustles) return;
+  document.getElementById("hustle-count-label").textContent = `${G.hustles.length}/3 ativos`;
+  grid.innerHTML = SIDE_HUSTLES.map(h => {
+    const active = G.hustles.find(a=>a.id===h.id);
+    const monthsActive = active?.monthsActive || 0;
+    const incomeIdx = Math.min(monthsActive, h.monthlyIncome.length-1);
+    let income = active ? h.monthlyIncome[incomeIdx] : h.monthlyIncome[0];
+    if (G.prof?.bonus === "hustle_boost" && active) income = Math.round(income * 1.2);
+    const canAfford = G.cash >= h.setupCost;
+    const maxReached = G.hustles.length >= 3 && !active;
+    return `
+      <div class="hustle-item ${active?'active':''} ${(!canAfford && !active)||maxReached?'disabled':''}"
+           onclick="${(!canAfford && !active)||maxReached?'':'toggleHustle(\''+h.id+'\')'}">
+        <div class="hustle-icon">${h.icon}</div>
+        <div class="hustle-info">
+          <div class="hustle-name">${h.name}</div>
+          <div class="hustle-income">${active ? `+€${income}/mês` : `€${fmt(h.setupCost)} setup`}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function showOpportunity(opp) {
+  const area = document.getElementById("opportunity-area");
+  area.style.display = "block";
+  const cost = opp.downpayment || opp.cost;
+  const canAfford = G.cash >= cost;
+  document.getElementById("opp-content").innerHTML = `
+    <div class="opp-title">${opp.title}</div>
+    <div class="opp-desc">${opp.desc}</div>
+    <div class="opp-stats">
+      <div class="opp-stat"><div class="opp-stat-label">Investimento</div><div class="opp-stat-val">€${fmt(cost)}</div></div>
+      <div class="opp-stat"><div class="opp-stat-label">Renda Mensal</div><div class="opp-stat-val">+€${fmt(opp.income)}/mês</div></div>
+      ${opp.mortgageCost ? `<div class="opp-stat"><div class="opp-stat-label">Prestação</div><div class="opp-stat-val" style="color:var(--danger)">−€${fmt(opp.mortgageCost)}/mês</div></div>` : ""}
+      <div class="opp-stat"><div class="opp-stat-label">Cash disponível</div><div class="opp-stat-val" style="color:${canAfford?'var(--accent)':'var(--danger)'}">€${fmt(G.cash)}</div></div>
+    </div>
+    <div class="opp-buttons">
+      <button class="btn btn-primary btn-sm ${canAfford?'':''}${!canAfford?'btn-disabled':''}" 
+              onclick="buyOpportunity(window._currentOpp)" ${!canAfford?'disabled':''}>
+        ${canAfford ? '✅ Investir' : '❌ Sem capital'}
+      </button>
+      <button class="btn btn-secondary btn-sm" onclick="skipOpportunity()">Passar →</button>
+    </div>
+  `;
+  window._currentOpp = opp;
+}
+
+function logEvent(text, type="neutral") {
+  const log = document.getElementById("event-log");
+  const item = document.createElement("div");
+  item.className = `event-item ${type}`;
+  item.textContent = text;
+  log.insertBefore(item, log.firstChild);
+  while (log.children.length > 30) log.removeChild(log.lastChild);
+}
+
+function showVictory() {
+  document.getElementById("v-months").textContent = G.month;
+  document.getElementById("v-passive").textContent = `€${fmt(getPassiveIncome())}/mês`;
+  document.getElementById("v-networth").textContent = `€${fmt(getNetWorth())}`;
+  showScreen("victory");
+}
+
+function showModal(tag, tagClass, title, desc, stats, actions) {
+  document.getElementById("modal-tag-el").innerHTML = `<span class="modal-tag ${tagClass}">${tag}</span>`;
+  document.getElementById("modal-title").textContent = title;
+  document.getElementById("modal-desc").textContent = desc;
+  document.getElementById("modal-stats").innerHTML = stats;
+  document.getElementById("modal-actions").innerHTML = actions;
+  document.getElementById("modal-overlay").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("modal-overlay").classList.remove("open");
+}
+
+function showHowTo() {
+  showModal(
+    "📖 Guia", "tag-market",
+    "Como Jogar Momentum FI",
+    "O teu objetivo é atingir 100% de Independência Financeira — quando a tua renda passiva cobre todas as despesas mensais.",
+    `<div style="grid-column:1/-1; font-size:0.85rem; color:var(--text2); line-height:1.7">
+      <b style="color:var(--text)">1. Avança os meses</b> — a cada mês recebes o teu salário líquido (já com IRS e Seg. Social descontados).<br><br>
+      <b style="color:var(--text)">2. Investe em ativos</b> — imóveis, ETFs, negócios e poupanças geram renda passiva mensal.<br><br>
+      <b style="color:var(--text)">3. Ativa side hustles</b> — crescem ao longo dos meses, gerando rendimento extra.<br><br>
+      <b style="color:var(--text)">4. Gere os imprevistos</b> — eventos aleatórios afetam o teu percurso (como na vida real).<br><br>
+      <b style="color:var(--accent)">Vences</b> quando a renda passiva ≥ despesas totais.
+    </div>`,
+    `<button class="btn btn-primary btn-full" onclick="closeModal()">Entendido!</button>`
+  );
+}
+
+function typeLabel(type) {
+  const map = { property: "🏠 Imóvel", stocks: "📈 ETF/Ações", savings: "💰 Poupança", business: "🏪 Negócio" };
+  return map[type] || type;
+}
+
+function fmt(n) {
+  if (typeof n !== "number") return "0";
+  return Math.abs(n).toLocaleString("pt-PT");
+}
+
+// ═══════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.onclick.toString().includes("'" + tab + "'")) b.classList.add('active');
+  });
+  if (tab === 'dashboard') updateDashboard();
+}
+
+// ═══════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════
+function updateDashboard() {
+  if (!G.prof) return;
+
+  const gross = G.salary * G.salaryMultiplier;
+  const taxes = calcTaxes(gross * 14);
+  const netSalary = getNetSalary();
+  const passive = getPassiveIncome();
+  const expenses = getTotalExpenses();
+  const flow = netSalary + passive - expenses;
+  const fi = getFIProgress();
+  const nw = getNetWorth();
+  const totalIn = netSalary + passive;
+
+  // Summary
+  const flowEl = document.getElementById('d-flow');
+  flowEl.textContent = (flow >= 0 ? '+' : '') + '€' + fmt(flow);
+  flowEl.style.color = flow >= 0 ? 'var(--accent)' : 'var(--danger)';
+  document.getElementById('d-passive').textContent = '€' + fmt(passive) + '/mês';
+  document.getElementById('d-fi-pct-label').textContent = fi + '% das despesas cobertas';
+  document.getElementById('d-networth').textContent = '€' + fmt(nw);
+  document.getElementById('d-months-label').textContent = 'mês ' + G.month;
+
+  // Entradas
+  document.getElementById('d-total-in').textContent = '€' + fmt(totalIn) + '/mês';
+  document.getElementById('d-total-in-2').textContent = '€' + fmt(totalIn) + '/mês';
+  document.getElementById('d-salary-gross').textContent = '€' + fmt(Math.round(gross));
+  document.getElementById('d-taxes').textContent = '−€' + fmt(taxes.total);
+  document.getElementById('d-salary-net').textContent = '+€' + fmt(netSalary);
+
+  // Passive income rows
+  let passiveRows = '';
+  G.assets.forEach(a => {
+    const inc = Math.round(a.income * G.stockMultiplier);
+    passiveRows += `<div class="dash-stat-row"><span class="dash-stat-label">${typeIcon(a.type)} ${a.name.substring(0,22)}</span><span class="dash-stat-value yel">+€${fmt(inc)}</span></div>`;
+  });
+  document.getElementById('d-passive-rows').innerHTML = passiveRows;
+
+  // Hustle rows
+  let hustleRows = '';
+  G.hustles.forEach(h => {
+    const hustle = SIDE_HUSTLES.find(s => s.id === h.id);
+    if (!hustle) return;
+    const idx = Math.min(h.monthsActive, hustle.monthlyIncome.length - 1);
+    let inc = hustle.monthlyIncome[idx];
+    if (G.prof.bonus === 'hustle_boost') inc = Math.round(inc * 1.2);
+    hustleRows += `<div class="dash-stat-row"><span class="dash-stat-label">${hustle.icon} ${hustle.name}</span><span class="dash-stat-value pos">+€${fmt(inc)}</span></div>`;
+  });
+  document.getElementById('d-hustle-rows').innerHTML = hustleRows;
+
+  // Saídas
+  const expLabels = { renda: '🏠 Renda/Hipoteca', alimentacao: '🛒 Alimentação', transportes: '🚗 Transportes', saude: '🏥 Saúde', outros: '📦 Outros' };
+  let expBody = '';
+  Object.entries(G.expenses).forEach(([k, v]) => {
+    const val = Math.round(v * G.expenseMultiplier);
+    expBody += `<div class="dash-stat-row"><span class="dash-stat-label">${expLabels[k] || k}</span><span class="dash-stat-value neg">−€${fmt(val)}</span></div>`;
+  });
+  Object.entries(G.loans).forEach(([k, v]) => {
+    if (v > 0) expBody += `<div class="dash-stat-row"><span class="dash-stat-label">💳 ${k}</span><span class="dash-stat-value neg">−€${fmt(v)}</span></div>`;
+  });
+  G.assets.filter(a => a.mortgage > 0).forEach(a => {
+    expBody += `<div class="dash-stat-row"><span class="dash-stat-label">🏦 Prestação: ${a.name.substring(0,18)}</span><span class="dash-stat-value neg">−€${fmt(a.mortgage)}</span></div>`;
+  });
+  expBody += `<div class="dash-total-row"><span>Total Saídas</span><span style="color:var(--danger)">−€${fmt(expenses)}</span></div>`;
+  document.getElementById('d-expenses-body').innerHTML = expBody;
+  document.getElementById('d-total-out').textContent = '−€' + fmt(expenses) + '/mês';
+
+  // Waterfall bars
+  const allExpenses = [];
+  Object.entries(G.expenses).forEach(([k, v]) => allExpenses.push({ label: expLabels[k] || k, val: Math.round(v * G.expenseMultiplier), color: 'var(--danger)' }));
+  Object.entries(G.loans).forEach(([k, v]) => { if (v > 0) allExpenses.push({ label: '💳 ' + k, val: v, color: 'var(--accent2)' }); });
+  G.assets.filter(a => a.mortgage > 0).forEach(a => allExpenses.push({ label: '🏦 Prestação', val: a.mortgage, color: 'var(--accent3)' }));
+  allExpenses.push({ label: '🏦 Impostos', val: taxes.total, color: '#f87171' });
+  const maxVal = Math.max(...allExpenses.map(e => e.val), 1);
+  let wf = '';
+  allExpenses.sort((a, b) => b.val - a.val).forEach(e => {
+    const pct = Math.round((e.val / maxVal) * 100);
+    wf += `<div class="wf-row">
+      <div class="wf-label">${e.label}</div>
+      <div class="wf-bar-bg"><div class="wf-bar-fill" style="width:${pct}%;background:${e.color}"></div></div>
+      <div class="wf-val" style="color:${e.color}">€${fmt(e.val)}</div>
+    </div>`;
+  });
+  document.getElementById('d-waterfall').innerHTML = wf;
+
+  // Assets
+  if (G.assets.length === 0) {
+    document.getElementById('d-assets-body').innerHTML = '<div style="color:var(--text2);font-size:0.82rem;font-style:italic">Ainda sem ativos. Investe!</div>';
+    document.getElementById('d-assets-total').textContent = '€0/mês';
+  } else {
+    let ab = '';
+    let totalPassive = 0;
+    G.assets.forEach(a => {
+      const inc = Math.round(a.income * G.stockMultiplier);
+      totalPassive += inc;
+      const net = a.mortgage ? inc - a.mortgage : inc;
+      ab += `<div class="dash-stat-row">
+        <span class="dash-stat-label">${typeIcon(a.type)} ${a.name.substring(0,24)}</span>
+        <span>
+          <span class="dash-stat-value yel">+€${fmt(inc)}</span>
+          ${a.mortgage ? `<span style="color:var(--text2);font-size:0.72rem"> (líq. €${fmt(net)})</span>` : ''}
+        </span>
+      </div>`;
+    });
+    ab += `<div class="dash-total-row"><span>Total Passivo</span><span style="color:var(--accent2)">€${fmt(totalPassive)}/mês</span></div>`;
+    document.getElementById('d-assets-body').innerHTML = ab;
+    document.getElementById('d-assets-total').textContent = '€' + fmt(totalPassive) + '/mês';
+  }
+
+  // Tax detail
+  const annualGross = Math.round(gross * 14);
+  const effectiveRate = Math.round((taxes.total * 12) / annualGross * 100);
+  document.getElementById('d-tax-detail').innerHTML = `
+    <div class="dash-stat-row"><span class="dash-stat-label">Salário bruto anual (14 meses)</span><span class="dash-stat-value neu">€${fmt(annualGross)}</span></div>
+    <div class="dash-stat-row"><span class="dash-stat-label">IRS (mensal)</span><span class="dash-stat-value neg">−€${fmt(taxes.irs)}</span></div>
+    <div class="dash-stat-row"><span class="dash-stat-label">Segurança Social 11%</span><span class="dash-stat-value neg">−€${fmt(taxes.ss)}</span></div>
+    ${taxes.surcharge > 0 ? `<div class="dash-stat-row"><span class="dash-stat-label">Sobretaxa</span><span class="dash-stat-value neg">−€${fmt(taxes.surcharge)}</span></div>` : ''}
+    <div class="dash-total-row"><span>Total impostos/mês</span><span style="color:var(--danger)">€${fmt(taxes.total)}</span></div>
+    <div style="margin-top:0.5rem; padding:0.5rem; background:var(--surface2); border-radius:8px; font-size:0.78rem; color:var(--text2)">
+      Taxa efectiva: <strong style="color:var(--danger)">${effectiveRate}%</strong> do rendimento bruto anual vai para o Estado.
+      ${G.prof.bonus === 'tax_reduction' ? '<br>✅ Bónus Contabilista: −10% aplicado.' : ''}
+    </div>
+  `;
+
+  // FI progress detail
+  const needed = Math.max(0, expenses - passive);
+  document.getElementById('d-fi-detail').innerHTML = `
+    <div class="dash-stat-row"><span class="dash-stat-label">Despesas totais/mês</span><span class="dash-stat-value neg">€${fmt(expenses)}</span></div>
+    <div class="dash-stat-row"><span class="dash-stat-label">Renda passiva/mês</span><span class="dash-stat-value yel">€${fmt(passive)}</span></div>
+    <div class="dash-stat-row"><span class="dash-stat-label">Falta para Rat Race Exit</span><span class="dash-stat-value ${needed === 0 ? 'pos' : 'neg'}">€${fmt(needed)}/mês</span></div>
+    <div style="margin:0.75rem 0 0.25rem">
+      <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text2);margin-bottom:4px">
+        <span>Progresso FI</span><span>${fi}%</span>
+      </div>
+      <div style="height:10px;background:var(--border);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${fi}%;background:linear-gradient(90deg,var(--accent),#00ff88);border-radius:99px;transition:width 0.5s"></div>
+      </div>
+    </div>
+    ${fi >= 100 ? '<div style="margin-top:0.5rem;padding:0.5rem;background:rgba(0,229,160,0.1);border-radius:8px;color:var(--accent);font-size:0.82rem;text-align:center">🏆 Rat Race Exit conquistado!</div>' :
+      fi >= 50 ? '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--text2)">Já cobres mais de metade das despesas com renda passiva. Continua!</div>' :
+      '<div style="margin-top:0.5rem;font-size:0.78rem;color:var(--text2)">Aumenta a renda passiva investindo em ativos e desenvolvendo side hustles.</div>'
+    }
+  `;
+}
+
+function typeIcon(type) {
+  const map = { property: '🏠', stocks: '📈', savings: '💰', business: '🏪' };
+  return map[type] || '📦';
+}
+
+// Close modal on overlay click
+document.getElementById('modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
