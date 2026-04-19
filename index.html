@@ -1883,7 +1883,8 @@ function updateUI() {
   // Hustles
   renderHustles();
 }
-  const grid = document.getElementById("hustles-grid");
+
+function renderHustles() {
   if (!G.hustles) return;
   document.getElementById("hustle-count-label").textContent = `${G.hustles.length}/3 ativos`;
   grid.innerHTML = SIDE_HUSTLES.map(h => {
