@@ -539,8 +539,41 @@
   .mstat-value { font-family: var(--font-head); font-weight: 700; font-size: 1rem; margin-top: 0.15rem; }
   .modal-actions { display: flex; gap: 0.75rem; }
 
-  /* Victory */
-  #victory {
+  /* ───── MULTIPLAYER ───── */
+  .mp-screen {
+    padding: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .mp-players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .mp-player-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .mp-player-card.active-turn { border-color: var(--accent); box-shadow: var(--glow); }
+  .mp-player-card.rat-race-out { border-color: var(--accent2); background: rgba(245,158,11,0.06); }
+  .mp-player-icon { font-size: 2rem; margin-bottom: 0.4rem; }
+  .mp-player-name { font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .mp-player-stat { font-size: 0.78rem; color: var(--text2); margin-top: 0.2rem; }
+  .mp-player-fi { font-family: var(--font-head); font-weight: 700; font-size: 1rem; margin-top: 0.4rem; }
+  .mp-fi-bar { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; margin-top: 0.3rem; }
+  .mp-fi-fill { height: 100%; background: linear-gradient(90deg,var(--accent),#00ff88); border-radius: 99px; transition: width 0.4s; }
+
+  @media (max-width: 768px) {
+    .mp-players-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ───── VICTORY ───── */
     align-items: center;
     justify-content: center;
     background: radial-gradient(ellipse at center, #0d2a1f 0%, #0a0e1a 70%);
@@ -695,6 +728,33 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
+  /* ───── FLOATING OPP BUTTON ───── */
+  .float-opp-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 90;
+    background: var(--accent2);
+    color: #0a0e1a;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.9rem;
+    padding: 0.9rem 2rem;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 24px rgba(245,158,11,0.5);
+    animation: pulse-opp 1.5s ease-in-out infinite;
+    display: none;
+    white-space: nowrap;
+  }
+  .float-opp-btn.visible { display: block; }
+  @keyframes pulse-opp {
+    0%,100% { box-shadow:0 4px 24px rgba(245,158,11,0.5); transform:translateX(-50%) scale(1); }
+    50% { box-shadow:0 4px 36px rgba(245,158,11,0.8); transform:translateX(-50%) scale(1.05); }
+  }
+
   /* Responsive / Mobile First */
   @media (max-width: 768px) {
     .game-header { padding: 0.5rem 0.75rem; gap: 0.4rem; }
@@ -762,6 +822,7 @@
     <p class="subtitle" id="i-subtitle">Conquista a tua liberdade financeira em Portugal</p>
     <div class="btn-group">
       <button class="btn btn-primary" onclick="showScreen('char-select')" id="i-start">▶ Começar</button>
+      <button class="btn btn-secondary" onclick="showScreen('mp-setup')" id="i-mp">👥 Multiplayer</button>
       <button class="btn btn-secondary" onclick="showHowTo()" id="i-howto">Como Jogar</button>
     </div>
     <p style="margin-top:1.5rem; font-size:0.75rem; color:var(--text2)" id="i-features">
@@ -1039,6 +1100,93 @@
   </div><!-- end tab-dashboard -->
 
 </div><!-- end #game -->
+
+<!-- Floating opportunity button — failsafe for mobile -->
+<button class="float-opp-btn" id="float-opp-btn" onclick="if(G.pendingOpportunity) showOpportunity(G.pendingOpportunity)">
+  🎯 Ver Oportunidade!
+</button>
+
+<!-- ═══════════ MULTIPLAYER SETUP ═══════════ -->
+<div id="mp-setup" class="screen">
+  <div class="mp-screen">
+    <div class="page-header">
+      <h2 style="font-family:var(--font-head);font-size:2rem;font-weight:800;color:var(--text)">👥 Multiplayer Hardcore</h2>
+      <p style="color:var(--text2);margin-top:0.4rem">Todos começam igual — salário mínimo, dívidas, sem historial. Ganha quem sair primeiro do Rat Race.</p>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;margin-bottom:1.5rem">
+      <div style="font-family:var(--font-head);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2);margin-bottom:0.75rem">Número de Jogadores</div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+        <button class="btn btn-secondary" id="mp-btn-2" onclick="setMpPlayers(2)">2 Jogadores</button>
+        <button class="btn btn-secondary" id="mp-btn-3" onclick="setMpPlayers(3)">3 Jogadores</button>
+        <button class="btn btn-secondary" id="mp-btn-4" onclick="setMpPlayers(4)">4 Jogadores</button>
+      </div>
+    </div>
+    <div id="mp-name-inputs" style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem"></div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="showScreen('intro')">← Voltar</button>
+      <button class="btn btn-primary" id="mp-start-btn" onclick="startMultiplayer()">🎮 Iniciar Partida</button>
+    </div>
+    <div style="margin-top:1rem;padding:0.75rem;background:var(--surface2);border-radius:8px;font-size:0.82rem;color:var(--text2)">
+      ⚡ Todos os jogadores começam como <b style="color:var(--danger)">Empregado(a) de Limpeza</b> — salário mínimo, €80 de crédito pessoal, €200 de capital inicial. As decisões é que fazem a diferença.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MULTIPLAYER GAME ═══════════ -->
+<div id="mp-game" class="screen">
+  <div class="game-header">
+    <div class="game-logo">Momentum FI <span style="color:var(--text2);font-size:0.75rem;font-weight:400">· Multiplayer</span></div>
+    <div class="header-stats">
+      <div class="hstat"><div class="hstat-label">Turno</div><div class="hstat-value blue" id="mp-turn-num">1</div></div>
+      <div class="hstat"><div class="hstat-label">Jogador Atual</div><div class="hstat-value" id="mp-current-player" style="color:var(--accent)">—</div></div>
+      <div class="hstat"><div class="hstat-label">Mês</div><div class="hstat-value blue" id="mp-month">1</div></div>
+    </div>
+    <button class="btn btn-sm btn-danger" onclick="showScreen('intro')">✕ Sair</button>
+  </div>
+
+  <!-- Players overview -->
+  <div style="padding:0.75rem 1rem;background:var(--surface);border-bottom:1px solid var(--border)">
+    <div class="mp-players-grid" id="mp-players-overview"></div>
+  </div>
+
+  <!-- Current player area -->
+  <div style="padding:1rem;max-width:700px;margin:0 auto;width:100%">
+    <div style="background:var(--surface);border:1px solid var(--accent);border-radius:var(--radius);padding:1rem;margin-bottom:1rem" id="mp-current-area">
+      <div style="font-family:var(--font-head);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:0.5rem">O TEU TURNO</div>
+      <div id="mp-player-stats"></div>
+    </div>
+
+    <!-- Event log -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem">
+      <div style="padding:0.6rem 1rem;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2)">📋 Eventos</div>
+      <div class="event-log" id="mp-event-log" style="max-height:120px"></div>
+    </div>
+
+    <!-- Side hustles for current player -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem">
+      <div style="padding:0.6rem 1rem;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border);font-family:var(--font-head);font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text2)">⚡ Side Hustles <span id="mp-hustle-label" style="margin-left:auto;font-size:0.7rem;color:var(--text2)"></span></div>
+      <div style="padding:0.75rem"><div class="hustles-grid" id="mp-hustles-grid"></div></div>
+    </div>
+
+    <button class="turn-btn" id="mp-turn-btn" onclick="mpAdvanceTurn()">Avançar Turno →</button>
+    <div style="text-align:center;font-size:0.72rem;color:var(--text2);margin-top:0.5rem" id="mp-fi-status"></div>
+  </div>
+</div>
+
+<!-- ═══════════ MP VICTORY ═══════════ -->
+<div id="mp-victory" class="screen" style="align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a1000 0%,#0a0e1a 70%);text-align:center;padding:2rem">
+  <div style="max-width:520px">
+    <div style="font-size:4rem;margin-bottom:1rem">🏆</div>
+    <div style="font-family:var(--font-head);font-size:3rem;font-weight:800;color:var(--accent2);line-height:1;margin-bottom:0.5rem" id="mp-winner-name">—</div>
+    <div style="color:var(--text2);margin-bottom:2rem;font-size:1.1rem">Saiu primeiro do Rat Race!</div>
+    <div id="mp-final-standings" style="margin-bottom:2rem"></div>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="showScreen('mp-setup')">Jogar Novamente</button>
+      <button class="btn btn-secondary" onclick="showScreen('intro')">Menu Principal</button>
+    </div>
+  </div>
+</div>
+
 <div id="victory" class="screen">
   <div class="victory-content">
     <div class="victory-icon">🏆</div>
@@ -1083,49 +1231,60 @@
 
 const PROFESSIONS = [
   {
-    id: "enfermeiro", icon: "🏥", name: "Enfermeiro(a)",
-    salary: 1400, desc: "Salário estável, horários rotativos. Difícil gerir side hustles no início.",
-    expenses: { renda: 500, alimentacao: 250, transportes: 120, saude: 30, outros: 100 },
-    loans: { estudantil: 0 },
-    startCash: 1200, risk: "baixo"
+    id: "medico", icon: "🩺", name: "Médico(a)",
+    salary: 3200, desc: "Alto salário mas muitos anos de formação e dívidas. Horários exigentes, lifestyle inflation é o maior inimigo.",
+    expenses: { renda: 900, alimentacao: 350, transportes: 200, saude: 60, outros: 300 },
+    loans: { estudantil: 450 },
+    startCash: 2000, risk: "medio"
   },
   {
     id: "programador", icon: "💻", name: "Programador(a)",
-    salary: 2200, desc: "Mercado aquecido. Alto potencial de crescimento e freelancing.",
+    salary: 2200, desc: "Mercado aquecido em Portugal. Alto potencial de crescimento e freelancing remoto.",
     expenses: { renda: 700, alimentacao: 300, transportes: 80, saude: 50, outros: 200 },
     loans: { estudantil: 180 },
     startCash: 3000, risk: "medio"
   },
   {
     id: "professor", icon: "📚", name: "Professor(a)",
-    salary: 1250, desc: "Estabilidade e férias longas. Ideal para side hustles educativos.",
+    salary: 1250, desc: "Estabilidade e férias longas. Progressão lenta na carreira pública.",
     expenses: { renda: 450, alimentacao: 220, transportes: 100, saude: 30, outros: 80 },
     loans: { estudantil: 0 },
     startCash: 800, risk: "baixo"
   },
   {
     id: "contabilista", icon: "📊", name: "Técnico(a) de Contas",
-    salary: 1600, desc: "Conhecimento fiscal é vantagem enorme. Sabe aproveitar deduções.",
+    salary: 1600, desc: "Conhecimento fiscal sólido. Procura estável, bom para freelancing paralelo.",
     expenses: { renda: 550, alimentacao: 260, transportes: 110, saude: 40, outros: 120 },
     loans: { estudantil: 0 },
-    startCash: 2500, risk: "baixo",
-    bonus: "tax_reduction" // 10% menos impostos
+    startCash: 2500, risk: "baixo"
   },
   {
     id: "arquiteto", icon: "🏛️", name: "Arquiteto(a)",
-    salary: 1800, desc: "Boa rede de contactos. Acesso a melhores deals imobiliários.",
+    salary: 1800, desc: "Boa rede de contactos no mercado imobiliário. Carreira com altos e baixos consoante o mercado.",
     expenses: { renda: 650, alimentacao: 280, transportes: 130, saude: 50, outros: 150 },
     loans: { estudantil: 220 },
-    startCash: 2000, risk: "medio",
-    bonus: "property_discount"
+    startCash: 2000, risk: "medio"
   },
   {
     id: "freelancer", icon: "🎨", name: "Freelancer Criativo",
-    salary: 1100, desc: "Rendimento variável, mas total liberdade. Mestre de side hustles.",
+    salary: 1100, desc: "Rendimento variável mês a mês. Total liberdade mas zero segurança. Exige autodisciplina.",
     expenses: { renda: 500, alimentacao: 240, transportes: 70, saude: 60, outros: 90 },
     loans: { estudantil: 0 },
-    startCash: 600, risk: "alto",
-    bonus: "hustle_boost" // Side hustles dão 20% mais
+    startCash: 600, risk: "alto"
+  },
+  {
+    id: "administrativo", icon: "🗂️", name: "Administrativo(a)",
+    salary: 1050, desc: "Trabalho estável mas salário baixo. Progressão lenta. O desafio é fazer mais com menos.",
+    expenses: { renda: 420, alimentacao: 200, transportes: 90, saude: 25, outros: 70 },
+    loans: { pessoal: 120 },
+    startCash: 500, risk: "baixo"
+  },
+  {
+    id: "limpeza", icon: "🧹", name: "Empregado(a) de Limpeza",
+    salary: 820, desc: "Salário mínimo, horários difíceis. Cada euro conta. A jornada mais difícil — e a mais realista para muitos.",
+    expenses: { renda: 350, alimentacao: 180, transportes: 80, saude: 20, outros: 50 },
+    loans: { pessoal: 80 },
+    startCash: 200, risk: "alto"
   }
 ];
 
@@ -1309,7 +1468,7 @@ function calcTaxes(annualGross) {
   let totalAnnual = tax + ss + surcharge;
 
   // Bonus: contabilista paga menos
-  if (G.prof && G.prof.bonus === "tax_reduction") totalAnnual *= 0.90;
+  
 
   return {
     irs: Math.round(tax / 12),
@@ -1344,7 +1503,7 @@ function getPassiveIncome() {
     const tier = Math.floor(h.monthsActive / (hustle.monthsPerTier || 3));
     const monthIdx = Math.min(tier, hustle.monthlyIncome.length-1);
     let inc = hustle.monthlyIncome[monthIdx];
-    if (G.prof.bonus === "hustle_boost") inc = Math.round(inc * 1.2);
+    
     total += inc;
   });
   return Math.round(total);
@@ -1373,17 +1532,9 @@ function getNetWorth() {
 //  GAME LOOP
 // ═══════════════════════════════════════════════════
 function advanceMonth() {
-  // BLOQUEAR se há oportunidade pendente
+  // Se já há oportunidade pendente, re-mostrar o modal (pode ter fechado sem decisão)
   if (G.pendingOpportunity) {
-    logEvent("⚠️ Tens uma oportunidade por responder! Decide antes de avançar.", "bad");
-    // Shake the opportunity area visually
-    const oppArea = document.getElementById("opportunity-area");
-    if (oppArea) {
-      oppArea.style.transition = "transform 0.1s";
-      oppArea.style.transform = "translateX(-6px)";
-      setTimeout(() => oppArea.style.transform = "translateX(6px)", 100);
-      setTimeout(() => oppArea.style.transform = "translateX(0)", 200);
-    }
+    showOpportunity(G.pendingOpportunity);
     return;
   }
 
@@ -1391,64 +1542,60 @@ function advanceMonth() {
   G.totalMonths++;
   const events = [];
 
-  // Income this month
   const netSalary = getNetSalary();
   const passive = getPassiveIncome();
   const expenses = getTotalExpenses();
   const flow = netSalary + passive - expenses;
-
   G.cash += flow;
 
   events.push({ type: flow >= 0 ? "good" : "bad",
-    text: `Mês ${G.month}: Salário líquido €${fmt(netSalary)} + Passivo €${fmt(passive)} − Despesas €${fmt(expenses)} = ${flow>=0?'+':''}€${fmt(flow)}` });
+    text: `Mês ${G.month}: Salário €${fmt(netSalary)} + Passivo €${fmt(passive)} − Despesas €${fmt(expenses)} = ${flow>=0?'+':''}€${fmt(flow)}` });
 
-  // Advance hustles
   G.hustles.forEach(h => h.monthsActive++);
 
-  // Random event (35% chance)
+  // Random event (35%) — guardar para mostrar DEPOIS da oportunidade se houver
+  let pendingEventPopup = null;
   if (Math.random() < 0.35) {
     const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-    applyEvent(ev, events);
+    applyEvent(ev, events, false); // false = não mostrar popup agora
+    if (ev.cost > 500 || ev.bonus > 1000 || ev.stockBoost || ev.stockDrop || ev.salaryBonus) {
+      pendingEventPopup = ev;
+    }
   }
 
-  // Opportunity (40% chance)
-  if (Math.random() < 0.40 && !G.pendingOpportunity) {
-    const opp = OPPORTUNITIES[Math.floor(Math.random() * OPPORTUNITIES.length)];
-    G.pendingOpportunity = opp;
-    showOpportunity(opp);
-    events.push({ type: "neutral", text: `🎯 Nova oportunidade: ${opp.title}` });
-  }
-
-  // Log events
   events.forEach(e => logEvent(e.text, e.type));
 
-  // Check Rat Race Exit (FI Progress >= 100%)
+  // Verificar vitória
   if (!G.ratRaceExited && getFIProgress() >= 100) {
     G.ratRaceExited = true;
-    showEventPopup({
-      type: "good",
-      title: "🏆 Rat Race Exit!",
-      desc: `A tua renda passiva cobre todas as despesas! Já não precisas de trabalhar para sobreviver. Agora vai ao próximo nível — €1.000.000 de património líquido.`,
-      cost: null
-    });
     logEvent("🏆 RAT RACE EXIT! Renda passiva cobre todas as despesas. Rumo ao milhão!", "good");
-  }
-
-  // Check final victory — €1.000.000 net worth
-  if (getNetWorth() >= 1000000) {
-    setTimeout(()=>showVictory(), 500);
+    updateUI();
+    setTimeout(() => showEventPopup({
+      type: "good", title: "🏆 Rat Race Exit!",
+      desc: "A tua renda passiva cobre todas as despesas! Já não precisas de trabalhar para sobreviver. Agora vai ao próximo nível — €1.000.000 de património líquido."
+    }), 300);
     return;
   }
 
-  // Check bankruptcy
-  if (G.cash < -5000) {
-    logEvent("⚠️ Dívida crítica! Reduz as tuas despesas urgentemente.", "bad");
-  }
+  if (getNetWorth() >= 1000000) { setTimeout(() => showVictory(), 300); return; }
+  if (G.cash < -5000) logEvent("⚠️ Dívida crítica! Reduz as tuas despesas urgentemente.", "bad");
 
   updateUI();
+
+  // Mostrar oportunidade OU evento — nunca os dois ao mesmo tempo
+  if (Math.random() < 0.40) {
+    const opp = OPPORTUNITIES[Math.floor(Math.random() * OPPORTUNITIES.length)];
+    G.pendingOpportunity = opp;
+    logEvent(`🎯 Nova oportunidade: ${opp.title}`, "neutral");
+    updateUI();
+    // Pequeno delay para garantir que o DOM está pronto no mobile
+    setTimeout(() => showOpportunity(opp), 150);
+  } else if (pendingEventPopup) {
+    setTimeout(() => showEventPopup(pendingEventPopup), 150);
+  }
 }
 
-function applyEvent(ev, events) {
+function applyEvent(ev, events, showPopup=true) {
   if (ev.cost) {
     G.cash -= ev.cost;
     events.push({ type: "bad", text: `⚠️ ${ev.title}: −€${fmt(ev.cost)}` });
@@ -1481,10 +1628,6 @@ function applyEvent(ev, events) {
     G.assets.filter(a=>a.type==="property").forEach(a=>{ a.income=Math.round(a.income*(1-ev.rentDrop)); });
     events.push({ type: "neutral", text: `🏘️ ${ev.title}: Rendas de imóveis caíram ${Math.round(ev.rentDrop*100)}%` });
   }
-  // Show dramatic popup for impactful events
-  if (ev.cost > 500 || ev.bonus > 1000 || ev.stockDrop || ev.stockBoost || ev.salaryBonus || ev.salaryLoss) {
-    setTimeout(() => showEventPopup(ev), 100);
-  }
 }
 
 // ── Event Pop-up ──────────────────────────────────────────────────────────────
@@ -1515,37 +1658,38 @@ function buyOpportunity(opp) {
   const cost = opp.downpayment || opp.cost;
   if (G.cash < cost) {
     logEvent(`❌ Sem dinheiro suficiente para ${opp.title}. Precisas de €${fmt(cost)}.`, "bad");
-    closeModal();
     G.pendingOpportunity = null;
-    document.getElementById("opportunity-area").style.display = "none";
+    closeModal();
     updateUI();
     return;
   }
   G.cash -= cost;
-  let assetIncome = opp.income;
-  let discount = G.prof.bonus === "property_discount" && opp.category === "property" ? 0.95 : 1;
 
   G.assets.push({
     name: opp.title,
-    income: Math.round(assetIncome),
-    value: Math.round((opp.cost || cost) * discount),
+    income: Math.round(opp.income),
+    value: Math.round(opp.cost || cost),
     type: opp.category,
     mortgage: opp.mortgageCost || 0,
     debtRemaining: opp.cost ? (opp.cost - cost) : 0
   });
 
   logEvent(`✅ Investiste em ${opp.title}. Renda mensal: +€${fmt(opp.income)}`, "good");
-  closeModal();
   G.pendingOpportunity = null;
-  document.getElementById("opportunity-area").style.display = "none";
+  const floatBtn = document.getElementById('float-opp-btn');
+  if (floatBtn) floatBtn.classList.remove('visible');
+  closeModal();
   updateUI();
 }
 
 function skipOpportunity() {
-  logEvent(`⏭️ Passaste a oportunidade: ${G.pendingOpportunity?.title}`, "neutral");
-  closeModal();
+  if (!G.pendingOpportunity) return;
+  logEvent(`⏭️ Passaste a oportunidade: ${G.pendingOpportunity.title}`, "neutral");
   G.pendingOpportunity = null;
-  document.getElementById("opportunity-area").style.display = "none";
+  const floatBtn = document.getElementById('float-opp-btn');
+  if (floatBtn) floatBtn.classList.remove('visible');
+  closeModal();
+  updateUI();
 }
 
 function toggleHustle(hustleId) {
@@ -1626,7 +1770,7 @@ function showProfDetail(prof) {
         <div class="fin-row"><span class="fin-row-label">Poupança/mês</span><span class="fin-row-value ${flow>=0?'pos':'neg'}">${flow>=0?'+':''}€${fmt(flow)}</span></div>
         <div class="fin-row"><span class="fin-row-label">Capital inicial</span><span class="fin-row-value yel">€${fmt(prof.startCash)}</span></div>
         <div class="fin-row"><span class="fin-row-label">Perfil de risco</span><span class="fin-row-value neu">${prof.risk}</span></div>
-        ${prof.bonus ? `<div class="fin-row"><span class="fin-row-label">Bónus</span><span class="badge badge-green">${getBonusLabel(prof.bonus)}</span></div>` : ""}
+        
       </div>
     </div>
   `;
@@ -1732,11 +1876,13 @@ function updateUI() {
     fiText.style.color = "var(--text2)";
   }
 
+  // Floating opportunity button — always accessible on mobile
+  const floatBtn = document.getElementById('float-opp-btn');
+  if (floatBtn) floatBtn.classList.toggle('visible', !!G.pendingOpportunity);
+
   // Hustles
   renderHustles();
 }
-
-function renderHustles() {
   const grid = document.getElementById("hustles-grid");
   if (!G.hustles) return;
   document.getElementById("hustle-count-label").textContent = `${G.hustles.length}/3 ativos`;
@@ -1746,7 +1892,7 @@ function renderHustles() {
     const tier = Math.floor(monthsActive / (h.monthsPerTier || 3));
     const incomeIdx = Math.min(tier, h.monthlyIncome.length-1);
     let income = active ? h.monthlyIncome[incomeIdx] : h.monthlyIncome[0];
-    if (G.prof?.bonus === "hustle_boost" && active) income = Math.round(income * 1.2);
+    
     const nextTierIn = active ? ((h.monthsPerTier || 3) - (monthsActive % (h.monthsPerTier || 3))) : null;
     const canAfford = G.cash >= h.setupCost;
     const maxReached = G.hustles.length >= 3 && !active;
@@ -1873,7 +2019,7 @@ function updateAssetsTab() {
     if (!hustle) return;
     const tier = Math.floor(h.monthsActive / (hustle.monthsPerTier||3));
     let inc = hustle.monthlyIncome[Math.min(tier, hustle.monthlyIncome.length-1)];
-    if (G.prof.bonus==='hustle_boost') inc = Math.round(inc*1.2);
+    
     hustleIncome += inc;
   });
   document.getElementById('at-hustles').textContent = G.hustles.length + '/3';
@@ -1913,7 +2059,7 @@ function updateAssetsTab() {
       const tier = Math.floor(h.monthsActive / (hustle.monthsPerTier||3));
       const maxTier = hustle.monthlyIncome.length - 1;
       let inc = hustle.monthlyIncome[Math.min(tier, maxTier)];
-      if (G.prof.bonus==='hustle_boost') inc = Math.round(inc*1.2);
+      
       const nextInc = tier < maxTier ? hustle.monthlyIncome[tier+1] : null;
       const monthsToNext = (hustle.monthsPerTier||3) - (h.monthsActive % (hustle.monthsPerTier||3));
       const tierPct = tier >= maxTier ? 100 : Math.round((h.monthsActive % (hustle.monthsPerTier||3)) / (hustle.monthsPerTier||3) * 100);
@@ -2000,7 +2146,7 @@ function updateDashboard() {
     if (!hustle) return;
     const idx = Math.min(h.monthsActive, hustle.monthlyIncome.length - 1);
     let inc = hustle.monthlyIncome[idx];
-    if (G.prof.bonus === 'hustle_boost') inc = Math.round(inc * 1.2);
+    
     hustleRows += `<div class="dash-stat-row"><span class="dash-stat-label">${hustle.icon} ${hustle.name}</span><span class="dash-stat-value pos">+€${fmt(inc)}</span></div>`;
   });
   document.getElementById('d-hustle-rows').innerHTML = hustleRows;
@@ -2075,7 +2221,7 @@ function updateDashboard() {
     <div class="dash-total-row"><span>Total impostos/mês</span><span style="color:var(--danger)">€${fmt(taxes.total)}</span></div>
     <div style="margin-top:0.5rem; padding:0.5rem; background:var(--surface2); border-radius:8px; font-size:0.78rem; color:var(--text2)">
       Taxa efectiva: <strong style="color:var(--danger)">${effectiveRate}%</strong> do rendimento bruto anual vai para o Estado.
-      ${G.prof.bonus === 'tax_reduction' ? '<br>✅ Bónus Contabilista: −10% aplicado.' : ''}
+      
     </div>
   `;
 
@@ -2104,6 +2250,364 @@ function typeIcon(type) {
   const map = { property: '🏠', stocks: '📈', savings: '💰', business: '🏪' };
   return map[type] || '📦';
 }
+
+// ═══════════════════════════════════════════════════
+//  MULTIPLAYER ENGINE
+// ═══════════════════════════════════════════════════
+const MP_ICONS = ['🦁','🐺','🦊','🦝'];
+const MP_COLORS = ['var(--accent)','var(--accent2)','var(--accent3)','var(--danger)'];
+
+let MP = {
+  players: [],
+  currentIdx: 0,
+  turn: 1,
+  pendingOpp: null
+};
+
+function setMpPlayers(n) {
+  [2,3,4].forEach(i => {
+    const btn = document.getElementById('mp-btn-' + i);
+    if (btn) btn.className = 'btn ' + (i === n ? 'btn-primary' : 'btn-secondary');
+  });
+  const container = document.getElementById('mp-name-inputs');
+  container.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    container.innerHTML += `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem">
+        <div style="font-size:1.5rem;text-align:center;margin-bottom:0.4rem">${MP_ICONS[i]}</div>
+        <input id="mp-name-${i}" type="text" placeholder="Jogador ${i+1}"
+          style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;
+                 padding:0.5rem 0.75rem;color:var(--text);font-family:var(--font-body);font-size:0.9rem;outline:none"
+          value="Jogador ${i+1}">
+      </div>`;
+  }
+  MP.numPlayers = n;
+}
+
+function mpInitPlayer(name, icon, color) {
+  const prof = PROFESSIONS.find(p => p.id === 'limpeza'); // Hardcore — all start equal
+  return {
+    name, icon, color,
+    salary: prof.salary,
+    expenses: { ...prof.expenses },
+    loans: { ...prof.loans },
+    cash: prof.startCash,
+    assets: [],
+    hustles: [],
+    month: 0,
+    ratRaceExited: false,
+    salaryMultiplier: 1,
+    expenseMultiplier: 1,
+    stockMultiplier: 1,
+    prof: prof
+  };
+}
+
+function mpGetPassiveIncome(p) {
+  let total = 0;
+  p.assets.forEach(a => total += a.income * p.stockMultiplier);
+  p.hustles.forEach(h => {
+    const hustle = SIDE_HUSTLES.find(s => s.id === h.id);
+    if (!hustle) return;
+    const tier = Math.floor(h.monthsActive / (hustle.monthsPerTier || 3));
+    total += hustle.monthlyIncome[Math.min(tier, hustle.monthlyIncome.length - 1)];
+  });
+  return Math.round(total);
+}
+
+function mpGetNetSalary(p) {
+  const gross = p.salary * p.salaryMultiplier;
+  const taxes = calcTaxes(gross * 14);
+  return Math.round(gross - taxes.total);
+}
+
+function mpGetExpenses(p) {
+  const base = Object.values(p.expenses).reduce((a,b)=>a+b,0) * p.expenseMultiplier;
+  const loans = Object.values(p.loans).reduce((a,b)=>a+b,0);
+  const mortgages = p.assets.filter(a=>a.mortgage).reduce((s,a)=>s+a.mortgage,0);
+  return Math.round(base + loans + mortgages);
+}
+
+function mpGetFI(p) {
+  const passive = mpGetPassiveIncome(p);
+  const expenses = mpGetExpenses(p);
+  if (expenses === 0) return 100;
+  return Math.min(100, Math.round((passive / expenses) * 100));
+}
+
+function startMultiplayer() {
+  const n = MP.numPlayers || 2;
+  MP.players = [];
+  MP.currentIdx = 0;
+  MP.turn = 1;
+  MP.pendingOpp = null;
+
+  for (let i = 0; i < n; i++) {
+    const nameEl = document.getElementById('mp-name-' + i);
+    const name = nameEl ? nameEl.value || `Jogador ${i+1}` : `Jogador ${i+1}`;
+    MP.players.push(mpInitPlayer(name, MP_ICONS[i], MP_COLORS[i]));
+  }
+
+  showScreen('mp-game');
+  mpUpdateUI();
+  mpLog(`🎮 Partida iniciada com ${n} jogadores! Todos começam como Empregado(a) de Limpeza — boa sorte!`, 'neutral');
+}
+
+function mpLog(text, type='neutral') {
+  const log = document.getElementById('mp-event-log');
+  if (!log) return;
+  const item = document.createElement('div');
+  item.className = `event-item ${type}`;
+  item.textContent = text;
+  log.insertBefore(item, log.firstChild);
+  while (log.children.length > 20) log.removeChild(log.lastChild);
+}
+
+function mpAdvanceTurn() {
+  if (MP.pendingOpp) {
+    mpLog('⚠️ Tens uma oportunidade por decidir!', 'bad');
+    return;
+  }
+
+  const p = MP.players[MP.currentIdx];
+  p.month++;
+
+  const netSalary = mpGetNetSalary(p);
+  const passive = mpGetPassiveIncome(p);
+  const expenses = mpGetExpenses(p);
+  const flow = netSalary + passive - expenses;
+  p.cash += flow;
+
+  p.hustles.forEach(h => h.monthsActive++);
+
+  mpLog(`${p.icon} ${p.name} — Mês ${p.month}: ${flow>=0?'+':''}€${fmt(flow)}`, flow>=0?'good':'bad');
+
+  // Random event (30%)
+  if (Math.random() < 0.30) {
+    const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+    const evs = [];
+    mpApplyEvent(p, ev, evs);
+    evs.forEach(e => mpLog(`${p.icon} ${e.text}`, e.type));
+    if (ev.cost > 300 || ev.bonus > 500 || ev.stockBoost || ev.stockDrop || ev.salaryBonus) {
+      setTimeout(() => showEventPopup(ev), 100);
+    }
+  }
+
+  // Opportunity (35%)
+  if (Math.random() < 0.35 && !MP.pendingOpp) {
+    const opp = OPPORTUNITIES[Math.floor(Math.random() * OPPORTUNITIES.length)];
+    MP.pendingOpp = opp;
+    mpShowOpportunity(p, opp);
+    return; // Don't advance turn until decision made
+  }
+
+  // Check Rat Race Exit
+  if (!p.ratRaceExited && mpGetFI(p) >= 100) {
+    p.ratRaceExited = true;
+    mpLog(`🏆 ${p.name} saiu do Rat Race!`, 'good');
+    showModal('🏆 Rat Race Exit!', 'tag-opportunity',
+      `${p.icon} ${p.name} saiu do Rat Race!`,
+      `A renda passiva de ${p.name} cobre todas as despesas! ${p.name} venceu a partida!`,
+      '',
+      `<button class="btn btn-primary btn-full" onclick="closeModal(); mpShowVictory('${MP.currentIdx}')">Ver Resultados 🏆</button>`
+    );
+    return;
+  }
+
+  // Next player
+  mpNextPlayer();
+}
+
+function mpApplyEvent(p, ev, events) {
+  if (ev.cost) { p.cash -= ev.cost; events.push({ type:'bad', text:`⚠️ ${ev.title}: −€${fmt(ev.cost)}` }); }
+  if (ev.bonus) { p.cash += ev.bonus; events.push({ type:'good', text:`✨ ${ev.title}: +€${fmt(ev.bonus)}` }); }
+  if (ev.rentIncrease) { p.expenses.renda = Math.round(p.expenses.renda*(1+ev.rentIncrease)); events.push({ type:'bad', text:`🏠 ${ev.title}` }); }
+  if (ev.salaryBonus) { p.salary = Math.round(p.salary*(1+ev.salaryBonus)); events.push({ type:'good', text:`🎉 ${ev.title}: Salário agora €${fmt(p.salary)}` }); }
+  if (ev.stockBoost) { p.assets.filter(a=>a.type==='stocks').forEach(a=>{a.value=Math.round(a.value*(1+ev.stockBoost));a.income=Math.round(a.income*(1+ev.stockBoost));}); events.push({ type:'good', text:`📈 ${ev.title}` }); }
+  if (ev.stockDrop) { p.assets.filter(a=>a.type==='stocks').forEach(a=>{a.value=Math.round(a.value*(1-ev.stockDrop));a.income=Math.round(a.income*(1-ev.stockDrop));}); events.push({ type:'bad', text:`📉 ${ev.title}` }); }
+  if (ev.expenseIncrease) { p.expenseMultiplier *= (1+ev.expenseIncrease); events.push({ type:'bad', text:`💸 ${ev.title}` }); }
+}
+
+function mpShowOpportunity(p, opp) {
+  const cost = opp.downpayment || opp.cost;
+  const canAfford = p.cash >= cost;
+  window._mpCurrentOpp = opp;
+
+  showModal('🎯 Oportunidade', 'tag-opportunity', opp.title, opp.desc,
+    `<div class="mstat"><div class="mstat-label">Investimento</div><div class="mstat-value" style="color:var(--accent3)">€${fmt(cost)}</div></div>
+     <div class="mstat"><div class="mstat-label">Renda Mensal</div><div class="mstat-value" style="color:var(--accent)">+€${fmt(opp.income)}/mês</div></div>
+     ${opp.mortgageCost?`<div class="mstat"><div class="mstat-label">Prestação</div><div class="mstat-value" style="color:var(--danger)">−€${fmt(opp.mortgageCost)}/mês</div></div>`:''}
+     <div class="mstat"><div class="mstat-label">Dinheiro de ${p.name}</div><div class="mstat-value" style="color:${canAfford?'var(--accent)':'var(--danger)'}">€${fmt(p.cash)}</div></div>`,
+    `<button class="btn btn-primary" style="flex:1" onclick="mpBuyOpportunity()" ${!canAfford?'disabled':''}>
+       ${canAfford?'✅ Investir':'❌ Sem capital'}
+     </button>
+     <button class="btn btn-secondary" style="flex:1" onclick="mpSkipOpportunity()">Passar →</button>`
+  );
+}
+
+function mpBuyOpportunity() {
+  const p = MP.players[MP.currentIdx];
+  const opp = window._mpCurrentOpp;
+  const cost = opp.downpayment || opp.cost;
+  if (p.cash >= cost) {
+    p.cash -= cost;
+    p.assets.push({
+      name: opp.title, income: Math.round(opp.income),
+      value: Math.round(opp.cost || cost), type: opp.category,
+      mortgage: opp.mortgageCost || 0
+    });
+    mpLog(`${p.icon} ${p.name} investiu em ${opp.title}. +€${fmt(opp.income)}/mês`, 'good');
+  }
+  MP.pendingOpp = null;
+  closeModal();
+  // Check FI after buying
+  if (!p.ratRaceExited && mpGetFI(p) >= 100) {
+    p.ratRaceExited = true;
+    setTimeout(() => {
+      showModal('🏆 Rat Race Exit!', 'tag-opportunity',
+        `${p.icon} ${p.name} saiu do Rat Race!`,
+        'A renda passiva cobre todas as despesas!',
+        '',
+        `<button class="btn btn-primary btn-full" onclick="closeModal(); mpShowVictory(${MP.currentIdx})">Ver Resultados 🏆</button>`
+      );
+    }, 300);
+    return;
+  }
+  mpNextPlayer();
+}
+
+function mpSkipOpportunity() {
+  const p = MP.players[MP.currentIdx];
+  mpLog(`${p.icon} ${p.name} passou a oportunidade.`, 'neutral');
+  MP.pendingOpp = null;
+  closeModal();
+  mpNextPlayer();
+}
+
+function mpToggleHustle(hustleId) {
+  const p = MP.players[MP.currentIdx];
+  const hustle = SIDE_HUSTLES.find(h => h.id === hustleId);
+  const existing = p.hustles.findIndex(h => h.id === hustleId);
+  if (existing >= 0) {
+    p.hustles.splice(existing, 1);
+    mpLog(`${p.icon} ${p.name} parou: ${hustle.name}`, 'neutral');
+  } else {
+    if (p.cash < hustle.setupCost) { mpLog(`${p.icon} Sem capital para ${hustle.name}`, 'bad'); return; }
+    if (p.hustles.length >= 3) { mpLog('⚠️ Máximo 3 side hustles!', 'neutral'); return; }
+    p.cash -= hustle.setupCost;
+    p.hustles.push({ id: hustleId, monthsActive: 0 });
+    mpLog(`${p.icon} ${p.name} iniciou: ${hustle.name}`, 'good');
+  }
+  mpUpdateUI();
+}
+
+function mpNextPlayer() {
+  MP.currentIdx = (MP.currentIdx + 1) % MP.players.length;
+  if (MP.currentIdx === 0) MP.turn++;
+  mpUpdateUI();
+}
+
+function mpUpdateUI() {
+  const p = MP.players[MP.currentIdx];
+  const netSalary = mpGetNetSalary(p);
+  const passive = mpGetPassiveIncome(p);
+  const expenses = mpGetExpenses(p);
+  const flow = netSalary + passive - expenses;
+  const fi = mpGetFI(p);
+
+  // Header
+  document.getElementById('mp-turn-num').textContent = MP.turn;
+  document.getElementById('mp-current-player').textContent = `${p.icon} ${p.name}`;
+  document.getElementById('mp-month').textContent = p.month + 1;
+
+  // Players overview
+  document.getElementById('mp-players-overview').innerHTML = MP.players.map((pl, i) => {
+    const plFi = mpGetFI(pl);
+    const plFlow = mpGetNetSalary(pl) + mpGetPassiveIncome(pl) - mpGetExpenses(pl);
+    return `<div class="mp-player-card ${i===MP.currentIdx?'active-turn':''} ${pl.ratRaceExited?'rat-race-out':''}">
+      <div class="mp-player-icon">${pl.icon}</div>
+      <div class="mp-player-name" style="color:${pl.color}">${pl.name}</div>
+      <div class="mp-player-stat">Dinheiro: €${fmt(pl.cash)}</div>
+      <div class="mp-player-stat">Fluxo: ${plFlow>=0?'+':''}€${fmt(plFlow)}/mês</div>
+      <div class="mp-player-fi" style="color:${pl.ratRaceExited?'var(--accent2)':pl.color}">${pl.ratRaceExited?'🏆 Rat Race Exit!':plFi+'% FI'}</div>
+      <div class="mp-fi-bar"><div class="mp-fi-fill" style="width:${plFi}%;background:${pl.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  // Current player stats
+  document.getElementById('mp-player-stats').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.5rem;margin-bottom:0.5rem">
+      <div style="text-align:center"><div style="font-size:0.65rem;color:var(--text2);text-transform:uppercase">Salário</div><div style="font-family:var(--font-head);font-weight:700;color:var(--accent)">€${fmt(netSalary)}</div></div>
+      <div style="text-align:center"><div style="font-size:0.65rem;color:var(--text2);text-transform:uppercase">Passivo</div><div style="font-family:var(--font-head);font-weight:700;color:var(--accent2)">€${fmt(passive)}</div></div>
+      <div style="text-align:center"><div style="font-size:0.65rem;color:var(--text2);text-transform:uppercase">Despesas</div><div style="font-family:var(--font-head);font-weight:700;color:var(--danger)">€${fmt(expenses)}</div></div>
+      <div style="text-align:center"><div style="font-size:0.65rem;color:var(--text2);text-transform:uppercase">Dinheiro</div><div style="font-family:var(--font-head);font-weight:700;color:${p.cash>=0?'var(--text)':'var(--danger)'}">€${fmt(p.cash)}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem">
+      <div style="flex:1;height:8px;background:var(--border);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${fi}%;background:linear-gradient(90deg,${p.color},#00ff88);border-radius:99px;transition:width 0.4s"></div>
+      </div>
+      <div style="font-family:var(--font-head);font-weight:700;font-size:0.85rem;color:${p.color}">${fi}% FI</div>
+    </div>`;
+
+  // FI status
+  document.getElementById('mp-fi-status').textContent =
+    fi >= 100 ? '🏆 Rat Race Exit!' :
+    fi >= 50 ? `Faltam €${fmt(mpGetExpenses(p)-passive)}/mês para o Rat Race Exit` :
+    `Constrói renda passiva — objetivo: cobrir €${fmt(mpGetExpenses(p))}/mês`;
+
+  // Hustles
+  document.getElementById('mp-hustle-label').textContent = `${p.hustles.length}/3 ativos`;
+  document.getElementById('mp-hustles-grid').innerHTML = SIDE_HUSTLES.map(h => {
+    const active = p.hustles.find(a => a.id === h.id);
+    const tier = active ? Math.floor(active.monthsActive / (h.monthsPerTier||3)) : 0;
+    const income = active ? h.monthlyIncome[Math.min(tier, h.monthlyIncome.length-1)] : 0;
+    const canAfford = p.cash >= h.setupCost;
+    const maxed = p.hustles.length >= 3 && !active;
+    return `<div class="hustle-item ${active?'active':''} ${(!canAfford&&!active)||maxed?'disabled':''}"
+         onclick="${(!canAfford&&!active)||maxed?'':'mpToggleHustle(\''+h.id+'\')'}">
+      <div class="hustle-icon">${h.icon}</div>
+      <div class="hustle-info">
+        <div class="hustle-name">${h.name}</div>
+        <div class="hustle-income">${active?`+€${income}/mês`:`€${fmt(h.setupCost)} setup`}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function mpShowVictory(winnerIdx) {
+  const winner = MP.players[winnerIdx];
+  document.getElementById('mp-winner-name').textContent = `${winner.icon} ${winner.name}`;
+
+  const standings = MP.players
+    .map((p, i) => ({ ...p, fi: mpGetFI(p), flow: mpGetNetSalary(p)+mpGetPassiveIncome(p)-mpGetExpenses(p) }))
+    .sort((a,b) => b.fi - a.fi);
+
+  document.getElementById('mp-final-standings').innerHTML = standings.map((p, i) => `
+    <div style="background:var(--surface);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:center;border:1px solid ${i===0?'var(--accent2)':'var(--border)'}">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <span style="font-family:var(--font-head);font-weight:800;font-size:1.1rem;color:${i===0?'var(--accent2)':'var(--text2)'}">#${i+1}</span>
+        <span style="font-size:1.3rem">${p.icon}</span>
+        <span style="font-family:var(--font-head);font-weight:700;color:${p.color}">${p.name}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:var(--font-head);font-weight:700;color:${p.ratRaceExited?'var(--accent2)':'var(--text)'}">${p.ratRaceExited?'🏆 Rat Race Exit':''+p.fi+'% FI'}</div>
+        <div style="font-size:0.75rem;color:var(--text2)">€${fmt(mpGetPassiveIncome(p))}/mês passivo · Mês ${p.month}</div>
+      </div>
+    </div>`).join('');
+
+  showScreen('mp-victory');
+}
+
+// Hook overlay click for multiplayer opportunity
+document.getElementById('modal-overlay').addEventListener('mousedown', function(e) {
+  if (e.target !== this) return;
+  if (MP.pendingOpp) { mpSkipOpportunity(); return; }
+});
+
+// Init multiplayer setup with 2 players by default
+setTimeout(() => setMpPlayers(2), 100);
+
+
 
 // ═══════════════════════════════════════════════════
 //  LANGUAGE / i18n
@@ -2203,9 +2707,14 @@ function showHowTo() {
   );
 }
 
-// Close modal on overlay click
+// Close modal on overlay click — if opportunity pending, skip it properly
 document.getElementById('modal-overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
+  if (e.target !== this) return;
+  if (G.pendingOpportunity) {
+    skipOpportunity();
+  } else {
+    closeModal();
+  }
 });
 </script>
 </body>
